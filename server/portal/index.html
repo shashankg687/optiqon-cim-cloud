@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optiqon CIM Cloud | Optical Quantum Computing Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       Optiqon CIM Cloud - Premium Quantum Design System
+       ========================================================================== */
+    :root {
+      --bg-dark: #070913;
+      --bg-surface: #0e1224;
+      --bg-card: rgba(18, 23, 46, 0.75);
+      --bg-card-border: rgba(0, 240, 255, 0.14);
+      --bg-card-hover: rgba(24, 30, 60, 0.85);
+      --bg-input: rgba(10, 13, 26, 0.95);
+      
+      --cyan-neon: #00f0ff;
+      --cyan-glow: rgba(0, 240, 255, 0.35);
+      --purple-laser: #b300ff;
+      --purple-glow: rgba(179, 0, 255, 0.35);
+      --green-status: #00ff9d;
+      --green-glow: rgba(0, 255, 157, 0.3);
+      --yellow-status: #ffb703;
+      --red-status: #ff3366;
+
+      --text-main: #f0f4fc;
+      --text-muted: #8b99bd;
+      --text-dim: #546082;
+
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      
+      --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(179, 0, 255, 0.14) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(0, 240, 255, 0.12) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(7, 9, 19, 0.95) 0%, rgba(14, 18, 36, 0.95) 100%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 36px;
+      background: rgba(10, 13, 26, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--bg-card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .laser-orb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--cyan-neon);
+      box-shadow: 0 0 12px var(--cyan-neon), 0 0 24px var(--purple-laser);
+      animation: pulse-orb 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-orb {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 8px var(--cyan-neon)); }
+    }
+
+    .brand-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffffff 40%, var(--cyan-neon) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-pill {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      background: rgba(179, 0, 255, 0.2);
+      color: #e2b3ff;
+      border: 1px solid rgba(179, 0, 255, 0.4);
+      letter-spacing: 1px;
+    }
+
+    /* Live Hardware Status Pill */
+    .hw-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+      font-family: var(--font-code);
+    }
+
+    .hw-online {
+      background: rgba(0, 255, 157, 0.1);
+      color: var(--green-status);
+      border-color: rgba(0, 255, 157, 0.3);
+      box-shadow: 0 0 12px rgba(0, 255, 157, 0.15);
+    }
+
+    .hw-offline {
+      background: rgba(255, 183, 3, 0.1);
+      color: var(--yellow-status);
+      border-color: rgba(255, 183, 3, 0.3);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--cyan-neon);
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-main);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan-neon), #00a2ff);
+      color: #070913;
+      box-shadow: 0 4px 14px var(--cyan-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--cyan-glow);
+    }
+
+    .btn-glow {
+      background: linear-gradient(135deg, var(--cyan-neon) 0%, var(--purple-laser) 100%);
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 20px var(--purple-glow);
+    }
+
+    .btn-glow:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 26px var(--cyan-glow), 0 0 35px var(--purple-glow);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--bg-card-border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--cyan-neon);
+      color: var(--cyan-neon);
+      background: rgba(0, 240, 255, 0.05);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.78rem;
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    /* Main Container & Telemetry Grid */
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 36px 64px 36px;
+    }
+
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(0, 240, 255, 0.35);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .stat-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-icon {
+      font-size: 1.25rem;
+    }
+
+    .stat-value {
+      font-size: 1.95rem;
+      font-weight: 700;
+      font-family: var(--font-code);
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .stat-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .highlight-card {
+      background: linear-gradient(135deg, rgba(20, 26, 54, 0.85), rgba(179, 0, 255, 0.18));
+      border-color: rgba(179, 0, 255, 0.4);
+    }
+
+    .highlight-card .stat-value {
+      color: var(--cyan-neon);
+      text-shadow: 0 0 12px var(--cyan-glow);
+    }
+
+    /* Workspace Grid */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 24px;
+    }
+
+    .panel-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 580px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--bg-card-border);
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Tab Switcher */
+    .tabs-nav {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-main);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: rgba(0, 240, 255, 0.18);
+      color: var(--cyan-neon);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Presets Row */
+    .presets-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .preset-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .preset-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-pill:hover {
+      background: rgba(0, 240, 255, 0.12);
+      color: var(--cyan-neon);
+      border-color: var(--cyan-neon);
+      transform: translateY(-1px);
+    }
+
+    /* Form Fields */
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .flex-1 { flex: 1; }
+    .flex-2 { flex: 2; }
+    .align-bottom { display: flex; align-items: flex-end; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 14px; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    select,
+    textarea {
+      background: var(--bg-input);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+    }
+
+    textarea.code-editor {
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      resize: vertical;
+      min-height: 140px;
+    }
+
+    .helper-text {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    /* SDK Box */
+    .api-key-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .key-display-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .key-display-row input {
+      flex: 1;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+    }
+
+    .code-preview-box {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--bg-card-border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .btn-copy-code {
+      background: transparent;
+      border: none;
+      color: var(--cyan-neon);
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .code-block {
+      padding: 16px;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      color: #a5b4fc;
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+
+    /* Table */
+    .table-container {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 480px;
+    }
+
+    .jobs-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.84rem;
+    }
+
+    .jobs-table th {
+      padding: 12px 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--bg-card-border);
+      position: sticky;
+      top: 0;
+      background: rgba(18, 23, 46, 0.98);
+      z-index: 10;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .jobs-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .jobs-table tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-completed {
+      background: rgba(0, 255, 157, 0.15);
+      color: var(--green-status);
+      border: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
+    .badge-running {
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--cyan-neon);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      animation: pulse-badge 1.5s infinite;
+    }
+
+    .badge-queued {
+      background: rgba(255, 183, 3, 0.15);
+      color: var(--yellow-status);
+      border: 1px solid rgba(255, 183, 3, 0.3);
+    }
+
+    .badge-failed {
+      background: rgba(255, 51, 102, 0.15);
+      color: var(--red-status);
+      border: 1px solid rgba(255, 51, 102, 0.3);
+    }
+
+    @keyframes pulse-badge {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px !important;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .queue-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .auto-refresh-pill {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-code);
+    }
+
+    .refresh-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--green-status);
+      box-shadow: 0 0 6px var(--green-status);
+    }
+
+    /* Modal Backdrop & Card */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(4, 6, 14, 0.82);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #111528;
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 620px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      animation: modal-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .auth-card {
+      max-width: 440px;
+    }
+
+    @keyframes modal-pop {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--bg-card-border);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 12px;
+    }
+
+    .auth-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-main);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .auth-tab-btn.active {
+      color: var(--cyan-neon);
+      border-bottom: 2px solid var(--cyan-neon);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Result Spin Grid */
+    .spin-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .spin-chip {
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      padding: 4px 9px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .spin-up {
+      background: rgba(0, 255, 157, 0.15);
+      color: var(--green-status);
+      border: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
+    .spin-down {
+      background: rgba(255, 51, 102, 0.15);
+      color: var(--red-status);
+      border: 1px solid rgba(255, 51, 102, 0.3);
+    }
+
+    @media (max-width: 1024px) {
+      .telemetry-grid { grid-template-columns: repeat(2, 1fr); }
+      .workspace-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .telemetry-grid { grid-template-columns: 1fr; }
+      .app-header { padding: 12px 18px; }
+      .main-container { padding: 18px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-logo">
+        <span class="laser-orb"></span>
+        <span class="brand-title">OPTIQON</span>
+        <span class="brand-pill">CIM CLOUD</span>
+      </div>
+      <div id="hardware-status-pill" class="hw-status-pill hw-offline">
+        <span class="pulse-dot"></span>
+        <span id="hw-status-text">Probing CIM Hardware (192.168.1.230:5050)...</span>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <a href="/docs" target="_blank" class="nav-link">Swagger Docs</a>
+      <div id="auth-nav-container">
+        <button id="btn-open-auth" class="btn btn-outline" onclick="openAuthModal('login')">Sign In</button>
+        <button id="btn-open-signup" class="btn btn-primary" onclick="openAuthModal('signup')">Sign Up</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <!-- Telemetry Metric Cards -->
+    <section class="telemetry-grid">
+      <div class="card stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Hardware Status</span>
+          <span class="stat-icon">⚡</span>
+        </div>
+        <div class="stat-value" id="stat-hw-status">Probing...</div>
+        <div class="stat-subtitle" id="stat-hw-latency">Target: 192.168.1.230:5050</div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Cavity Bifurcation Time</span>
+          <span class="stat-icon">⏱️</span>
+        </div>
+        <div class="stat-value" id="stat-avg-latency">~80 ms</div>
+        <div class="stat-subtitle">Analog Optical Parametric Phase</div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Active Queue Depth</span>
+          <span class="stat-icon">📊</span>
+        </div>
+        <div class="stat-value" id="stat-queue-depth">0</div>
+        <div class="stat-subtitle" id="stat-total-jobs">Total Solves: 0</div>
+      </div>
+
+      <div class="card stat-card highlight-card">
+        <div class="stat-header">
+          <span class="stat-title">My Compute Credits</span>
+          <span class="stat-icon">🪙</span>
+        </div>
+        <div class="stat-value" id="stat-user-credits">--</div>
+        <div class="stat-subtitle" id="stat-user-tier">Sign In to View</div>
+      </div>
+    </section>
+
+    <!-- Workspace Grid -->
+    <div class="workspace-grid">
+      <!-- Left Panel: Problem Submission & SDK -->
+      <section class="card panel-card left-panel">
+        <div class="panel-header">
+          <div class="tabs-nav">
+            <button id="tab-btn-submit" class="tab-btn active" onclick="switchLeftTab('submit')">Submit Problem</button>
+            <button id="tab-btn-sdk" class="tab-btn" onclick="switchLeftTab('sdk')">Python SDK & API Key</button>
+          </div>
+        </div>
+
+        <!-- Submit Tab Content -->
+        <div id="tab-content-submit" class="tab-pane active">
+          <!-- Preset Buttons -->
+          <div class="presets-row">
+            <span class="preset-label">Quick Presets:</span>
+            <button class="preset-pill" onclick="loadPreset('max_cut_petersen')">Max-Cut (Petersen)</button>
+            <button class="preset-pill" onclick="loadPreset('number_partition')">Number Partition</button>
+            <button class="preset-pill" onclick="loadPreset('benti_neuromechanical_16')">Benti ARCAF 16-Ch</button>
+          </div>
+
+          <form id="job-form" onsubmit="handleJobSubmit(event)">
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label for="job-label">Job Label</label>
+                <input type="text" id="job-label" placeholder="e.g. Adversarial Manifold Inversion" required value="Adversarial Manifold Solve">
+              </div>
+              <div class="form-group flex-1">
+                <label for="problem-type">Formulation</label>
+                <select id="problem-type" onchange="handleProblemTypeChange()">
+                  <option value="QUBO" selected>QUBO (Matrix Dict)</option>
+                  <option value="MAX_CUT">Graph Max-Cut</option>
+                  <option value="NUMBER_PARTITION">Number Partitioning</option>
+                  <option value="ISING">Ising (h, J)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="problem-data" id="problem-data-label">QUBO Coefficients JSON</label>
+              <textarea id="problem-data" rows="7" spellcheck="false" class="code-editor" required></textarea>
+              <small class="helper-text" id="problem-helper">Enter QUBO dictionary as JSON {"i,j": weight}</small>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="job-shots">Laser Cavity Sweeps (Shots)</label>
+                <input type="number" id="job-shots" min="1" max="1000" value="20">
+              </div>
+              <div class="form-group flex-1 align-bottom">
+                <button type="submit" id="btn-submit-job" class="btn btn-glow btn-full">
+                  <span>⚡</span> Dispatch to Optical CIM
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- SDK Tab Content -->
+        <div id="tab-content-sdk" class="tab-pane">
+          <div class="api-key-box">
+            <label>Your Live API Key</label>
+            <div class="key-display-row">
+              <input type="password" id="display-api-key" readonly value="Sign in to generate API key">
+              <button class="btn btn-secondary" onclick="toggleApiKeyVisibility()">Show</button>
+              <button class="btn btn-primary" onclick="copyApiKey()">Copy</button>
+            </div>
+            <button class="btn btn-outline btn-sm mt-2" onclick="handleGenerateNewKey()">+ Generate New Key</button>
+          </div>
+
+          <div class="code-preview-box">
+            <div class="code-header">
+              <span>Google Colab / Python SDK Quickstart</span>
+              <button class="btn-copy-code" onclick="copyCodeSnippet()">Copy Code</button>
+            </div>
+            <pre class="code-block" id="sdk-code-snippet"><code>from sdk.cim_client import CIMClient
+
+client = CIMClient(api_key="YOUR_API_KEY", base_url="http://localhost:8000")
+
+# Define QUBO
+Q = {(0, 0): -2.5, (1, 1): 2.5, (0, 1): 0.45}
+
+# Dispatch directly to physical Optiqon CIM
+job = client.submit_qubo(Q, label="Colab Optimization Run")
+result = job.wait_for_completion()
+
+print("Optical Solve Latency:", result.execution_time_ms, "ms")
+print("Ground State Energy:", result.energy)
+print("Optimal Spins:", result.spins)</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Live Queue & Results History -->
+      <section class="card panel-card right-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Job Execution Queue & History</h2>
+          <div class="queue-controls">
+            <span class="auto-refresh-pill">
+              <span class="refresh-dot"></span> Auto (1.5s)
+            </span>
+            <button class="btn btn-secondary btn-sm" onclick="refreshJobsTable()" title="Refresh Now">🔄</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="jobs-table" id="jobs-table">
+            <thead>
+              <tr>
+                <th>Job ID</th>
+                <th>Label</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Cavity Time</th>
+                <th>Energy</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="jobs-table-body">
+              <tr>
+                <td colspan="7" class="empty-state">No jobs found. Dispatch a problem above!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Job Details Modal -->
+  <div id="job-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-job-title">Job Details</h3>
+        <button class="modal-close" onclick="closeJobModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modal-job-body"></div>
+    </div>
+  </div>
+
+  <!-- Auth Modal (Sign In / Sign Up) -->
+  <div id="auth-modal" class="modal-backdrop">
+    <div class="modal-card auth-card">
+      <div class="modal-header">
+        <div class="auth-tabs">
+          <button id="auth-tab-login" class="auth-tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+          <button id="auth-tab-signup" class="auth-tab-btn" onclick="switchAuthTab('signup')">Sign Up</button>
+        </div>
+        <button class="modal-close" onclick="closeAuthModal()">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Login Form -->
+        <form id="form-login" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" required placeholder="researcher@university.edu">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full mt-3">Sign In to CIM Cloud</button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="form-signup" class="hidden" onsubmit="handleSignup(event)">
+          <div class="form-group">
+            <label for="signup-name">Full Name</label>
+            <input type="text" id="signup-name" required placeholder="Dr. Jane Doe">
+          </div>
+          <div class="form-group">
+            <label for="signup-email">Email Address</label>
+            <input type="email" id="signup-email" required placeholder="jane@lab.org">
+          </div>
+          <div class="form-group">
+            <label for="signup-org">Organization / Affiliation</label>
+            <input type="text" id="signup-org" placeholder="Quantum Lab / IIT Indore / Enterprise">
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password (min 6 characters)</label>
+            <input type="password" id="signup-password" minlength="6" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full mt-3">Create Account (+100 Free Credits)</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client JavaScript Logic -->
+  <script>
+    const API_BASE = window.location.origin;
+
+    let currentUser = null;
+    let authToken = localStorage.getItem("cim_auth_token") || null;
+    let currentApiKey = localStorage.getItem("cim_api_key") || null;
+    let presetsCache = {};
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await fetchPresets();
+      await checkHardwareHealth();
+      setInterval(checkHardwareHealth, 5000);
+
+      if (authToken) {
+        await fetchUserProfile();
+      } else {
+        updateAuthNav();
+      }
+
+      loadPreset("max_cut_petersen");
+      pollJobsLoop();
+    });
+
+    async function checkHardwareHealth() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/hardware/status`);
+        if (!res.ok) throw new Error("Hardware status error");
+        const data = await res.json();
+
+        const pill = document.getElementById("hardware-status-pill");
+        const pillText = document.getElementById("hw-status-text");
+        const statStatus = document.getElementById("stat-hw-status");
+        const statLatency = document.getElementById("stat-hw-latency");
+        const statAvgLatency = document.getElementById("stat-avg-latency");
+        const statQueue = document.getElementById("stat-queue-depth");
+        const statTotal = document.getElementById("stat-total-jobs");
+
+        if (data.hardware_online) {
+          pill.className = "hw-status-pill hw-online";
+          pillText.innerText = `CIM BENCH: ONLINE (${data.ping_latency_ms} ms)`;
+          statStatus.innerText = "ONLINE";
+          statStatus.style.color = "var(--green-status)";
+          statLatency.innerText = `IP: 192.168.1.230:5050 (${data.ping_latency_ms} ms)`;
+          statAvgLatency.innerText = `${data.ping_latency_ms || 80.6} ms`;
+        } else {
+          pill.className = "hw-status-pill hw-offline";
+          pillText.innerText = "CIM BENCH: STANDBY / CALIBRATING";
+          statStatus.innerText = "STANDBY";
+          statStatus.style.color = "var(--yellow-status)";
+          statLatency.innerText = "Digital Twin Calibrated";
+        }
+
+        statQueue.innerText = data.active_queue_depth || 0;
+        statTotal.innerText = `Total Solves: ${data.total_jobs_completed || 0}`;
+      } catch (err) {
+        console.warn("Hardware health check error:", err);
+      }
+    }
+
+    async function fetchUserProfile() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/auth/me`, {
+          headers: { "Authorization": `Bearer ${authToken}` }
+        });
+        
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        
+        const data = await res.json();
+        currentUser = data.user;
+        
+        document.getElementById("stat-user-credits").innerText = currentUser.credits;
+        document.getElementById("stat-user-tier").innerText = `${currentUser.tier.toUpperCase()} TIER`;
+
+        if (data.api_keys && data.api_keys.length > 0) {
+          currentApiKey = currentApiKey || data.api_keys[0].key_id;
+          document.getElementById("display-api-key").value = currentApiKey;
+        }
+
+        updateAuthNav();
+        updateCodeSnippet();
+        refreshJobsTable();
+      } catch (err) {
+        console.error("Profile error:", err);
+      }
+    }
+
+    function updateAuthNav() {
+      const container = document.getElementById("auth-nav-container");
+      if (currentUser) {
+        container.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:0.85rem; font-weight:600; color:var(--text-main);">${currentUser.full_name}</span>
+            <span class="badge badge-completed">${currentUser.credits} Credits</span>
+            <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <button id="btn-open-auth" class="btn btn-outline" onclick="openAuthModal('login')">Sign In</button>
+          <button id="btn-open-signup" class="btn btn-primary" onclick="openAuthModal('signup')">Sign Up</button>
+        `;
+        document.getElementById("stat-user-credits").innerText = "--";
+        document.getElementById("stat-user-tier").innerText = "Sign in to activate";
+      }
+    }
+
+    function logout() {
+      authToken = null;
+      currentApiKey = null;
+      currentUser = null;
+      localStorage.removeItem("cim_auth_token");
+      localStorage.removeItem("cim_api_key");
+      updateAuthNav();
+      document.getElementById("jobs-table-body").innerHTML = `
+        <tr><td colspan="7" class="empty-state">Sign in to view your quantum job history.</td></tr>
+      `;
+    }
+
+    function openAuthModal(mode) {
+      document.getElementById("auth-modal").classList.add("active");
+      switchAuthTab(mode);
+    }
+
+    function closeAuthModal() {
+      document.getElementById("auth-modal").classList.remove("active");
+    }
+
+    function switchAuthTab(mode) {
+      const btnLogin = document.getElementById("auth-tab-login");
+      const btnSignup = document.getElementById("auth-tab-signup");
+      const formLogin = document.getElementById("form-login");
+      const formSignup = document.getElementById("form-signup");
+
+      if (mode === "login") {
+        btnLogin.classList.add("active");
+        btnSignup.classList.remove("active");
+        formLogin.classList.remove("hidden");
+        formSignup.classList.add("hidden");
+      } else {
+        btnLogin.classList.remove("active");
+        btnSignup.classList.add("active");
+        formLogin.classList.add("hidden");
+        formSignup.classList.remove("hidden");
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Authentication failed");
+
+        authToken = data.access_token;
+        localStorage.setItem("cim_auth_token", authToken);
+        closeAuthModal();
+        await fetchUserProfile();
+      } catch (err) {
+        alert("Login Error: " + err.message);
+      }
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      const full_name = document.getElementById("signup-name").value;
+      const email = document.getElementById("signup-email").value;
+      const organization = document.getElementById("signup-org").value;
+      const password = document.getElementById("signup-password").value;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/auth/signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ full_name, email, organization, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Registration failed");
+
+        authToken = data.access_token;
+        currentApiKey = data.primary_api_key;
+        localStorage.setItem("cim_auth_token", authToken);
+        localStorage.setItem("cim_api_key", currentApiKey);
+        
+        document.getElementById("display-api-key").value = currentApiKey;
+        closeAuthModal();
+        await fetchUserProfile();
+        alert(`Account created! Welcome, ${full_name}. You have 100 free CIM solve credits.`);
+      } catch (err) {
+        alert("Signup Error: " + err.message);
+      }
+    }
+
+    async function fetchPresets() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/presets`);
+        if (res.ok) {
+          presetsCache = await res.json();
+        }
+      } catch (err) {
+        console.error("Presets error:", err);
+      }
+    }
+
+    function loadPreset(key) {
+      const preset = presetsCache[key];
+      if (!preset) return;
+
+      document.getElementById("job-label").value = preset.name;
+      const typeSelect = document.getElementById("problem-type");
+      typeSelect.value = preset.problem_type;
+
+      const dataArea = document.getElementById("problem-data");
+      if (preset.qubo) {
+        dataArea.value = JSON.stringify(preset.qubo, null, 2);
+      } else if (preset.edges) {
+        dataArea.value = JSON.stringify(preset.edges, null, 2);
+      } else if (preset.numbers) {
+        dataArea.value = JSON.stringify(preset.numbers, null, 2);
+      }
+      handleProblemTypeChange();
+    }
+
+    function handleProblemTypeChange() {
+      const type = document.getElementById("problem-type").value;
+      const label = document.getElementById("problem-data-label");
+      const helper = document.getElementById("problem-helper");
+
+      if (type === "QUBO") {
+        label.innerText = "QUBO Coefficients JSON";
+        helper.innerText = 'Format: {"i,j": weight} e.g. {"0,0": -2.5, "0,1": 1.2}';
+      } else if (type === "MAX_CUT") {
+        label.innerText = "Graph Edges JSON";
+        helper.innerText = 'Format: [[u, v, weight], ...] e.g. [[0, 1], [1, 2], [2, 0]]';
+      } else if (type === "NUMBER_PARTITION") {
+        label.innerText = "Number List JSON";
+        helper.innerText = 'Format: [int, int, ...] e.g. [19, 17, 13, 9, 6]';
+      } else if (type === "ISING") {
+        label.innerText = "Ising JSON (linear & quadratic)";
+        helper.innerText = 'Format: {"linear": {"0": -1.0}, "quadratic": {"0,1": 0.5}}';
+      }
+    }
+
+    async function handleJobSubmit(e) {
+      e.preventDefault();
+
+      if (!authToken && !currentApiKey) {
+        openAuthModal("signup");
+        return;
+      }
+
+      const label = document.getElementById("job-label").value;
+      const problem_type = document.getElementById("problem-type").value;
+      const shots = parseInt(document.getElementById("job-shots").value, 10);
+      const rawData = document.getElementById("problem-data").value;
+
+      let parsedData;
+      try {
+        parsedData = JSON.parse(rawData);
+      } catch (err) {
+        alert("Invalid JSON format in Problem Coefficients: " + err.message);
+        return;
+      }
+
+      const payload = { label, problem_type, shots };
+      if (problem_type === "QUBO") payload.qubo = parsedData;
+      else if (problem_type === "MAX_CUT") payload.edges = parsedData;
+      else if (problem_type === "NUMBER_PARTITION") payload.numbers = parsedData;
+      else if (problem_type === "ISING") {
+        payload.linear = parsedData.linear || {};
+        payload.quadratic = parsedData.quadratic || {};
+      }
+
+      const btn = document.getElementById("btn-submit-job");
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳</span> Dispatching to CIM...`;
+
+      try {
+        const headers = { "Content-Type": "application/json" };
+        if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+        else if (currentApiKey) headers["X-CIM-API-Key"] = currentApiKey;
+
+        const res = await fetch(`${API_BASE}/api/v1/jobs/submit`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Submission failed");
+
+        await refreshJobsTable();
+        await fetchUserProfile();
+      } catch (err) {
+        alert("Submission Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>⚡</span> Dispatch to Optical CIM`;
+      }
+    }
+
+    async function pollJobsLoop() {
+      if (authToken || currentApiKey) {
+        await refreshJobsTable();
+      }
+      setTimeout(pollJobsLoop, 1500);
+    }
+
+    async function refreshJobsTable() {
+      if (!authToken && !currentApiKey) return;
+
+      try {
+        const headers = {};
+        if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+        else if (currentApiKey) headers["X-CIM-API-Key"] = currentApiKey;
+
+        const res = await fetch(`${API_BASE}/api/v1/jobs?limit=25`, { headers });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const tbody = document.getElementById("jobs-table-body");
+
+        if (!data.jobs || data.jobs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No jobs found. Dispatch a problem above!</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = data.jobs.map(j => {
+          const statusBadge = getStatusBadge(j.status);
+          const timeDisplay = j.execution_time_ms ? `${j.execution_time_ms} ms` : "--";
+          const energyDisplay = j.result_energy !== null && j.result_energy !== undefined ? j.result_energy.toFixed(3) : "--";
+
+          return `
+            <tr>
+              <td><code style="color:var(--cyan-neon); font-size:0.78rem;">${j.job_id.substring(0, 12)}...</code></td>
+              <td>${escapeHtml(j.label || "Untitled")}</td>
+              <td><span class="badge" style="background:rgba(255,255,255,0.06);">${j.problem_type}</span></td>
+              <td>${statusBadge}</td>
+              <td style="font-family:var(--font-code); font-size:0.8rem;">${timeDisplay}</td>
+              <td style="font-family:var(--font-code); font-size:0.8rem; color:#d896ff;">${energyDisplay}</td>
+              <td>
+                <button class="btn btn-secondary btn-sm" onclick="viewJobDetails('${j.job_id}')">Details</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      } catch (err) {
+        console.error("Jobs error:", err);
+      }
+    }
+
+    function getStatusBadge(status) {
+      if (status === "COMPLETED") return `<span class="badge badge-completed">COMPLETED</span>`;
+      if (status === "RUNNING") return `<span class="badge badge-running">RUNNING</span>`;
+      if (status === "QUEUED") return `<span class="badge badge-queued">QUEUED</span>`;
+      if (status === "FAILED") return `<span class="badge badge-failed">FAILED</span>`;
+      return `<span class="badge">${status}</span>`;
+    }
+
+    async function viewJobDetails(jobId) {
+      try {
+        const headers = {};
+        if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+        else if (currentApiKey) headers["X-CIM-API-Key"] = currentApiKey;
+
+        const res = await fetch(`${API_BASE}/api/v1/jobs/${jobId}`, { headers });
+        if (!res.ok) throw new Error("Could not fetch job");
+        const j = await res.json();
+
+        document.getElementById("modal-job-title").innerText = `Job: ${j.label || j.job_id}`;
+        
+        let spinsHtml = "";
+        if (j.result_spins) {
+          spinsHtml = `
+            <div style="margin-top:14px;">
+              <label style="font-size:0.82rem; font-weight:700;">Ground State Spins:</label>
+              <div class="spin-grid">
+                ${Object.entries(j.result_spins).map(([k, v]) => `
+                  <span class="spin-chip ${v > 0 ? 'spin-up' : 'spin-down'}">
+                    s<sub>${k}</sub> = ${v > 0 ? '+1' : '-1'}
+                  </span>
+                `).join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        document.getElementById("modal-job-body").innerHTML = `
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div><strong>Status:</strong> ${getStatusBadge(j.status)}</div>
+            <div><strong>Hardware Mode:</strong> <span style="color:var(--cyan-neon); font-weight:600;">${j.hardware_mode || 'Pending'}</span></div>
+            <div><strong>Ground State Energy:</strong> <code style="color:#d896ff;">${j.result_energy !== null ? j.result_energy : '--'}</code></div>
+            <div><strong>Optical Latency:</strong> <code>${j.execution_time_ms ? j.execution_time_ms + ' ms' : '--'}</code></div>
+            <div><strong>Problem Type:</strong> ${j.problem_type} (${j.num_variables} variables)</div>
+            <div><strong>Submitted:</strong> <small>${new Date(j.created_at).toLocaleTimeString()}</small></div>
+          </div>
+          ${spinsHtml}
+          ${j.error_message ? `<div style="color:var(--red-status); margin-top:12px;"><strong>Error:</strong> ${j.error_message}</div>` : ''}
+        `;
+
+        document.getElementById("job-modal").classList.add("active");
+      } catch (err) {
+        alert("Error fetching job: " + err.message);
+      }
+    }
+
+    function closeJobModal() {
+      document.getElementById("job-modal").classList.remove("active");
+    }
+
+    function switchLeftTab(tab) {
+      const btnSubmit = document.getElementById("tab-btn-submit");
+      const btnSdk = document.getElementById("tab-btn-sdk");
+      const contentSubmit = document.getElementById("tab-content-submit");
+      const contentSdk = document.getElementById("tab-content-sdk");
+
+      if (tab === "submit") {
+        btnSubmit.classList.add("active");
+        btnSdk.classList.remove("active");
+        contentSubmit.classList.add("active");
+        contentSdk.classList.remove("active");
+      } else {
+        btnSubmit.classList.remove("active");
+        btnSdk.classList.add("active");
+        contentSubmit.classList.remove("active");
+        contentSdk.classList.add("active");
+      }
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById("display-api-key");
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    function copyApiKey() {
+      const input = document.getElementById("display-api-key");
+      navigator.clipboard.writeText(input.value);
+      alert("API Key copied to clipboard!");
+    }
+
+    async function handleGenerateNewKey() {
+      if (!authToken) {
+        openAuthModal("login");
+        return;
+      }
+      const label = prompt("Enter a label for this API key:", "Python SDK Client");
+      if (!label) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/auth/api-keys`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ label })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Key generation failed");
+
+        currentApiKey = data.api_key;
+        localStorage.setItem("cim_api_key", currentApiKey);
+        document.getElementById("display-api-key").value = currentApiKey;
+        updateCodeSnippet();
+        alert("New API Key generated successfully!");
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    }
+
+    function updateCodeSnippet() {
+      const key = currentApiKey || "YOUR_API_KEY";
+      const snippet = `from sdk.cim_client import CIMClient
+
+client = CIMClient(api_key="${key}", base_url="${API_BASE}")
+
+# Define QUBO
+Q = {(0, 0): -2.5, (1, 1): 2.5, (0, 1): 0.45}
+
+# Dispatch directly to physical Optiqon CIM
+job = client.submit_qubo(Q, label="Colab Optimization Run")
+result = job.wait_for_completion()
+
+print("Optical Solve Latency:", result.execution_time_ms, "ms")
+print("Ground State Energy:", result.energy)
+print("Optimal Spins:", result.spins)`;
+
+      document.getElementById("sdk-code-snippet").innerHTML = `<code>${escapeHtml(snippet)}</code>`;
+    }
+
+    function copyCodeSnippet() {
+      const text = document.getElementById("sdk-code-snippet").innerText;
+      navigator.clipboard.writeText(text);
+      alert("Code snippet copied to clipboard!");
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.innerText = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
