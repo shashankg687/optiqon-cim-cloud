@@ -299,8 +299,36 @@
     </div>
   </div>
 
-  <!-- API Key storage field -->
-  <input type="hidden" id="display-api-key">
+  <!-- ======================================================================
+       Modals: API Key & Python SDK Access Modal
+       ====================================================================== -->
+  <div id="apikey-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:620px;">
+      <div class="modal-header">
+        <span class="modal-title">Quantum Ising Optimizer // API Access</span>
+        <button class="modal-close-btn" onclick="closeApiKeyModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom:18px;">
+          <label style="font-family:var(--font-mono); font-size:0.74rem; font-weight:700; text-transform:uppercase; display:block; margin-bottom:6px;">Your Active API Key</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="display-api-key" class="form-input" style="flex:1; font-family:var(--font-mono); font-size:0.8rem;" readonly>
+            <button class="btn-preset" onclick="copyApiKey()">Copy Key</button>
+            <button class="btn-preset" onclick="handleGenerateNewKey()">Generate New</button>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-dim); margin-top:4px; display:block;">Pass this key in HTTP header: <code>X-CIM-API-Key: cim_live_...</code></span>
+        </div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+            <label style="font-family:var(--font-mono); font-size:0.74rem; font-weight:700; text-transform:uppercase;">Direct Python Code Snippet</label>
+            <button class="btn-preset" style="font-size:0.7rem; padding:2px 8px;" onclick="copyCodeSnippet()">Copy Code</button>
+          </div>
+          <pre id="sdk-code-snippet" style="background:var(--bg-editor); border:1.5px solid #111; padding:12px; border-radius:4px; font-family:var(--font-mono); font-size:0.75rem; overflow-x:auto; line-height:1.45; color:#111; max-height:220px;"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="/portal/app.js"></script>
 </body>

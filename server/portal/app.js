@@ -108,19 +108,37 @@ function updateAuthNav() {
   const container = document.getElementById("auth-nav-container");
   if (currentUser) {
     container.innerHTML = `
-      <div style="display:flex; align-items:center; gap:12px;">
+      <div style="display:flex; align-items:center; gap:16px;">
         <span style="font-size:0.85rem; font-weight:600; color:var(--text-main);">${currentUser.full_name}</span>
-        <span class="badge badge-completed">${currentUser.credits} Credits</span>
-        <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+        <span class="status-tag completed" style="font-size:0.75rem;">${currentUser.credits} Credits</span>
+        <button class="gray-nav-link" style="background:none; border:none; cursor:pointer; font-weight:700; text-decoration:underline;" onclick="openApiKeyModal()">API Key ↗</button>
+        <button class="gray-nav-link" style="background:none; border:none; cursor:pointer; color:var(--text-muted);" onclick="logout()">Sign Out</button>
       </div>
     `;
+    document.getElementById("stat-user-credits").innerText = currentUser.credits;
+    document.getElementById("stat-user-tier").innerText = `${currentUser.tier.toUpperCase()} TIER`;
   } else {
     container.innerHTML = `
-      <button id="btn-open-auth" class="btn btn-outline" onclick="openAuthModal('login')">Sign In</button>
-      <button id="btn-open-signup" class="btn btn-primary" onclick="openAuthModal('signup')">Sign Up</button>
+      <button id="btn-open-auth" class="gray-nav-link" style="background:none; border:none; cursor:pointer;" onclick="openAuthModal('login')">Sign In</button>
+      <button id="btn-open-signup" class="gray-nav-link" style="background:none; border:none; font-weight:700; cursor:pointer; text-decoration:underline;" onclick="openAuthModal('signup')">Sign Up</button>
     `;
     document.getElementById("stat-user-credits").innerText = "--";
     document.getElementById("stat-user-tier").innerText = "Sign in to activate";
+  }
+}
+
+function openApiKeyModal() {
+  const modal = document.getElementById("apikey-modal");
+  if (modal) {
+    modal.classList.add("active");
+    updateCodeSnippet();
+  }
+}
+
+function closeApiKeyModal() {
+  const modal = document.getElementById("apikey-modal");
+  if (modal) {
+    modal.classList.remove("active");
   }
 }
 
