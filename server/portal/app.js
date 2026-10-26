@@ -52,7 +52,7 @@ async function checkHardwareHealth() {
       pillText.innerText = `CIM Hardware: ONLINE (${data.ping_latency_ms} ms)`;
       statStatus.innerText = "Online";
       statStatus.style.color = "var(--status-green)";
-      statLatency.innerText = `IP: 192.168.1.230:5050 (${data.ping_latency_ms} ms)`;
+      statLatency.innerText = `OPO Pulsed Cavity Bench (${data.ping_latency_ms} ms)`;
       statAvgLatency.innerText = `${data.ping_latency_ms || 67.5} ms`;
     } else {
       pill.className = "status-pill status-offline";
@@ -368,8 +368,14 @@ async function refreshJobsTable() {
     const tbody = document.getElementById("jobs-table-body");
 
     if (!data.jobs || data.jobs.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No jobs found. Dispatch a problem above!</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted);">No jobs found. Dispatch a problem above!</td></tr>`;
       return;
+    }
+
+    // If there's a recent completed job, update phone inspector
+    const latestCompleted = data.jobs.find(j => j.status === "COMPLETED");
+    if (latestCompleted && latestCompleted.result_spins) {
+      updatePhoneInspector(latestCompleted);
     }
 
     tbody.innerHTML = data.jobs.map(j => {
@@ -379,14 +385,14 @@ async function refreshJobsTable() {
 
       return `
         <tr>
-          <td><code style="color:var(--primary-cyan); font-size:0.78rem;">${j.job_id.substring(0, 12)}...</code></td>
-          <td>${escapeHtml(j.label || "Untitled")}</td>
-          <td><span class="badge" style="background:rgba(255,255,255,0.06);">${j.problem_type}</span></td>
+          <td><span class="table-id-code">${j.job_id.substring(0, 12)}...</span></td>
+          <td><strong>${escapeHtml(j.label || "Untitled")}</strong></td>
+          <td><span style="font-family:var(--font-mono); font-size:0.75rem;">${j.problem_type}</span></td>
           <td>${statusBadge}</td>
-          <td style="font-family:var(--font-code); font-size:0.8rem;">${timeDisplay}</td>
-          <td style="font-family:var(--font-code); font-size:0.8rem; color:#d896ff;">${energyDisplay}</td>
+          <td style="font-family:var(--font-mono); font-size:0.78rem;">${timeDisplay}</td>
+          <td style="font-family:var(--font-mono); font-size:0.78rem; font-weight:600;">${energyDisplay}</td>
           <td>
-            <button class="btn btn-secondary btn-sm" onclick="viewJobDetails('${j.job_id}')">Details</button>
+            <button class="btn-table-action" onclick="viewJobDetails('${j.job_id}')">Details ↗</button>
           </td>
         </tr>
       `;
@@ -396,12 +402,36 @@ async function refreshJobsTable() {
   }
 }
 
+function updatePhoneInspector(job) {
+  const container = document.getElementById("phone-spins-container");
+  const energyTag = document.getElementById("inspector-energy-tag");
+  const latencyTag = document.getElementById("phone-last-latency");
+
+  if (energyTag && job.result_energy !== null && job.result_energy !== undefined) {
+    energyTag.innerText = `E₀: ${job.result_energy.toFixed(3)}`;
+    energyTag.style.color = "#000000";
+  }
+
+  if (latencyTag && job.execution_time_ms) {
+    latencyTag.innerText = `${job.execution_time_ms} ms`;
+  }
+
+  if (container && job.result_spins) {
+    const entries = Object.entries(job.result_spins).slice(0, 16);
+    container.innerHTML = entries.map(([k, v]) => `
+      <span class="spin-chip-pill ${v > 0 ? 'spin-up' : 'spin-down'}">
+        s<sub>${k}</sub> = ${v > 0 ? '+1' : '-1'}
+      </span>
+    `).join("");
+  }
+}
+
 function getStatusBadge(status) {
-  if (status === "COMPLETED") return `<span class="badge badge-completed">COMPLETED</span>`;
-  if (status === "RUNNING") return `<span class="badge badge-running">RUNNING</span>`;
-  if (status === "QUEUED") return `<span class="badge badge-queued">QUEUED</span>`;
-  if (status === "FAILED") return `<span class="badge badge-failed">FAILED</span>`;
-  return `<span class="badge">${status}</span>`;
+  if (status === "COMPLETED") return `<span class="status-tag completed">COMPLETED</span>`;
+  if (status === "RUNNING") return `<span class="status-tag running">RUNNING</span>`;
+  if (status === "QUEUED") return `<span class="status-tag queued">QUEUED</span>`;
+  if (status === "FAILED") return `<span class="status-tag failed">FAILED</span>`;
+  return `<span class="status-tag">${status}</span>`;
 }
 
 async function viewJobDetails(jobId) {
@@ -419,11 +449,11 @@ async function viewJobDetails(jobId) {
     let spinsHtml = "";
     if (j.result_spins) {
       spinsHtml = `
-        <div style="margin-top:14px;">
-          <label style="font-size:0.85rem; font-weight:600;">Discovered Ground State Spins:</label>
-          <div class="spin-grid">
+        <div style="margin-top:16px;">
+          <label style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; text-transform:uppercase; margin-bottom:8px; display:block;">Discovered Ground State Spins:</label>
+          <div class="spin-chips-grid">
             ${Object.entries(j.result_spins).map(([k, v]) => `
-              <span class="spin-chip ${v > 0 ? 'spin-up' : 'spin-down'}">
+              <span class="spin-chip-pill ${v > 0 ? 'spin-up' : 'spin-down'}">
                 s<sub>${k}</sub> = ${v > 0 ? '+1' : '-1'}
               </span>
             `).join("")}
@@ -433,16 +463,16 @@ async function viewJobDetails(jobId) {
     }
 
     document.getElementById("modal-job-body").innerHTML = `
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; font-size:0.85rem; border-bottom:var(--border-hair); padding-bottom:14px;">
         <div><strong>Status:</strong> ${getStatusBadge(j.status)}</div>
-        <div><strong>Hardware:</strong> <span style="color:var(--primary-cyan); font-weight:600;">${j.hardware_mode || 'Pending'}</span></div>
-        <div><strong>Ground State Energy:</strong> <code style="color:#d896ff;">${j.result_energy !== null ? j.result_energy : '--'}</code></div>
-        <div><strong>Optical Latency:</strong> <code>${j.execution_time_ms ? j.execution_time_ms + ' ms' : '--'}</code></div>
-        <div><strong>Problem Type:</strong> ${j.problem_type} (${j.num_variables} variables)</div>
-        <div><strong>Submitted At:</strong> <small>${new Date(j.created_at).toLocaleTimeString()}</small></div>
+        <div><strong>Hardware:</strong> <span style="font-family:var(--font-mono); font-weight:600;">${j.hardware_mode || 'Pending'}</span></div>
+        <div><strong>Ground State Energy:</strong> <strong style="font-family:var(--font-mono);">${j.result_energy !== null ? j.result_energy : '--'}</strong></div>
+        <div><strong>Optical Latency:</strong> <span style="font-family:var(--font-mono);">${j.execution_time_ms ? j.execution_time_ms + ' ms' : '--'}</span></div>
+        <div><strong>Problem Type:</strong> <span style="font-family:var(--font-mono);">${j.problem_type} (${j.num_variables} variables)</span></div>
+        <div><strong>Submitted At:</strong> <small style="font-family:var(--font-mono);">${new Date(j.created_at).toLocaleTimeString()}</small></div>
       </div>
       ${spinsHtml}
-      ${j.error_message ? `<div style="color:var(--status-red); margin-top:12px;"><strong>Error:</strong> ${j.error_message}</div>` : ''}
+      ${j.error_message ? `<div style="color:var(--status-red); margin-top:12px; font-family:var(--font-mono); font-size:0.8rem;"><strong>Error:</strong> ${j.error_message}</div>` : ''}
     `;
 
     document.getElementById("job-modal").classList.add("active");

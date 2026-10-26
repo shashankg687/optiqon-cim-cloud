@@ -7,1329 +7,301 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <style>
-    /* ==========================================================================
-       Quantum Ising Optimizer - Minimalist Editorial Design System
-       Inspiration: Benti Systems Adversarial Report & Gray Sunderland
-       ========================================================================== */
-    :root {
-      --bg-page: #f5f5f3;
-      --bg-card: #ffffff;
-      --border-black: #111111;
-      --border-light: #dededb;
-      --text-black: #111111;
-      --text-muted: #555555;
-      --text-dim: #888888;
-      --accent-black: #000000;
-      --status-green: #0a8754;
-      --status-green-bg: #e8f5ed;
-      --status-yellow: #996500;
-      --status-yellow-bg: #fff8e6;
-      --status-red: #c92a2a;
-      --status-red-bg: #ffebe9;
-      
-      --font-grotesk: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', "Courier New", monospace;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg-page);
-      color: var(--text-black);
-      font-family: var(--font-grotesk);
-      min-height: 100vh;
-      line-height: 1.45;
-      -webkit-font-smoothing: antialiased;
-      padding: 32px 24px 64px 24px;
-    }
-
-    /* Outer Wrapper / Paper Container */
-    .sheet-wrapper {
-      max-width: 1320px;
-      margin: 0 auto;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-black);
-      box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.08);
-      padding: 40px 48px;
-    }
-
-    /* Top Running Header (Benti Editorial Style) */
-    .running-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      border-bottom: 2px solid var(--border-black);
-      padding-bottom: 12px;
-      margin-bottom: 32px;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .running-header-left {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .running-header-right {
-      color: var(--text-muted);
-    }
-
-    /* Main Editorial Hero / Title */
-    .hero-section {
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 32px;
-      border-bottom: 1.5px solid var(--border-black);
-      padding-bottom: 28px;
-      margin-bottom: 32px;
-    }
-
-    .main-title {
-      font-size: 3rem;
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-      color: var(--text-black);
-      margin-bottom: 8px;
-    }
-
-    .main-title .dot {
-      color: var(--accent-black);
-    }
-
-    .main-subtitle {
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: -0.01em;
-    }
-
-    .metadata-block {
-      border-left: 1px solid var(--border-light);
-      padding-left: 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      font-size: 0.82rem;
-    }
-
-    .meta-item {
-      margin-bottom: 8px;
-    }
-
-    .meta-label {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .meta-val {
-      font-weight: 600;
-      color: var(--text-black);
-      font-family: var(--font-mono);
-    }
-
-    .nav-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    /* Benti Black Callout Box (Signature Element) */
-    .attestation-callout {
-      background: var(--border-black);
-      color: #ffffff;
-      padding: 16px 24px;
-      margin-bottom: 32px;
-      border: 1px solid var(--border-black);
-    }
-
-    .attestation-title {
-      font-family: var(--font-mono);
-      font-size: 0.76rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #ffffff;
-      margin-bottom: 6px;
-    }
-
-    .attestation-body {
-      font-size: 0.92rem;
-      line-height: 1.5;
-      font-weight: 400;
-      color: #eaeaea;
-    }
-
-    /* Section Numbering & Headers */
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      border-bottom: 1.5px solid var(--border-black);
-      padding-bottom: 8px;
-      margin-bottom: 20px;
-      margin-top: 36px;
-    }
-
-    .section-title {
-      font-size: 1.15rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-    }
-
-    .section-ref {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-
-    /* Scorecard Grid */
-    .scorecard-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .scorecard-cell {
-      border: 1px solid var(--border-black);
-      padding: 18px 20px;
-      background: #ffffff;
-      transition: all 0.15s ease;
-    }
-
-    .scorecard-cell:hover {
-      box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.06);
-    }
-
-    .sc-label {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    .sc-val {
-      font-size: 1.7rem;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      letter-spacing: -0.03em;
-      color: var(--text-black);
-      margin-bottom: 4px;
-    }
-
-    .sc-sub {
-      font-size: 0.76rem;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-    }
-
-    /* Workspace Two-Column */
-    .workspace-row {
-      display: grid;
-      grid-template-columns: 1.05fr 1fr;
-      gap: 32px;
-      margin-bottom: 32px;
-    }
-
-    /* Tabs & Navigation */
-    .tab-bar {
-      display: flex;
-      border-bottom: 1px solid var(--border-black);
-      margin-bottom: 20px;
-    }
-
-    .tab-link {
-      background: none;
-      border: none;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 10px 18px;
-      cursor: pointer;
-      color: var(--text-muted);
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-    }
-
-    .tab-link.active {
-      color: var(--text-black);
-      border-bottom: 2px solid var(--border-black);
-      background: #fafaf8;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Presets Strip */
-    .presets-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-    }
-
-    .preset-title {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .preset-chip {
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border: 1px solid var(--border-black);
-      background: #ffffff;
-      color: var(--text-black);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .preset-chip:hover {
-      background: var(--border-black);
-      color: #ffffff;
-    }
-
-    /* Form Inputs */
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-row {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .flex-1 { flex: 1; }
-    .flex-2 { flex: 2; }
-
-    label {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 6px;
-      color: var(--text-black);
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="number"],
-    select,
-    textarea {
-      width: 100%;
-      background: #ffffff;
-      border: 1.5px solid var(--border-black);
-      color: var(--text-black);
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      padding: 10px 14px;
-      border-radius: 0;
-      outline: none;
-      transition: background 0.15s ease;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      background: #fafaf8;
-      border-color: #000000;
-    }
-
-    textarea.code-area {
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
-      line-height: 1.45;
-      min-height: 140px;
-      resize: vertical;
-    }
-
-    /* Buttons (Swiss Inversion Style) */
-    .btn {
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 11px 20px;
-      cursor: pointer;
-      border: 1.5px solid var(--border-black);
-      border-radius: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-
-    .btn-black {
-      background: var(--border-black);
-      color: #ffffff;
-    }
-
-    .btn-black:hover {
-      background: #ffffff;
-      color: var(--border-black);
-      box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-white {
-      background: #ffffff;
-      color: var(--border-black);
-    }
-
-    .btn-white:hover {
-      background: var(--border-black);
-      color: #ffffff;
-    }
-
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 0.74rem;
-    }
-
-    .btn-full {
-      width: 100%;
-    }
-
-    /* Table (Editorial Scorecard Style) */
-    .audit-table-wrapper {
-      border: 1px solid var(--border-black);
-      overflow-x: auto;
-      background: #ffffff;
-    }
-
-    .audit-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.82rem;
-      text-align: left;
-    }
-
-    .audit-table th {
-      background: #f7f7f5;
-      color: var(--text-black);
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 10px 14px;
-      border-bottom: 1.5px solid var(--border-black);
-    }
-
-    .audit-table td {
-      padding: 11px 14px;
-      border-bottom: 1px solid var(--border-light);
-      font-family: var(--font-mono);
-    }
-
-    .audit-table tr:hover td {
-      background: #fafaf8;
-    }
-
-    /* Status Badges */
-    .status-tag {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border: 1px solid currentColor;
-    }
-
-    .tag-completed {
-      background: var(--status-green-bg);
-      color: var(--status-green);
-    }
-
-    .tag-running {
-      background: var(--status-yellow-bg);
-      color: var(--status-yellow);
-    }
-
-    .tag-queued {
-      background: #f0f0f0;
-      color: #666666;
-    }
-
-    .tag-failed {
-      background: var(--status-red-bg);
-      color: var(--status-red);
-    }
-
-    .empty-row {
-      text-align: center;
-      padding: 36px !important;
-      color: var(--text-dim);
-    }
-
-    /* SDK Box */
-    .sdk-container {
-      border: 1.5px solid var(--border-black);
-      padding: 20px;
-      background: #fcfcfb;
-    }
-
-    .sdk-code {
-      background: #111111;
-      color: #f0f0f0;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      line-height: 1.5;
-      padding: 16px;
-      overflow-x: auto;
-      margin-top: 10px;
-    }
-
-    /* Modals */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.65);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-box {
-      background: #ffffff;
-      border: 2px solid var(--border-black);
-      box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-      max-width: 580px;
-      width: 100%;
-      padding: 32px;
-    }
-
-    .modal-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
-      border-bottom: 1.5px solid var(--border-black);
-      padding-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-close-btn {
-      background: none;
-      border: none;
-      font-size: 1.4rem;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .spin-matrix {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .spin-item {
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      padding: 3px 8px;
-      border: 1px solid var(--border-black);
-      font-weight: 700;
-    }
-
-    .spin-pos {
-      background: #ffffff;
-      color: #000000;
-    }
-
-    .spin-neg {
-      background: #000000;
-      color: #ffffff;
-    }
-
-    @media (max-width: 960px) {
-      .sheet-wrapper { padding: 24px 20px; }
-      .hero-section { grid-template-columns: 1fr; }
-      .metadata-block { border-left: none; padding-left: 0; border-top: 1px solid var(--border-light); padding-top: 16px; }
-      .scorecard-grid { grid-template-columns: 1fr 1fr; }
-      .workspace-row { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 600px) {
-      .scorecard-grid { grid-template-columns: 1fr; }
-      .main-title { font-size: 2.2rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="/portal/style.css">
 </head>
-
 <body>
-  <div class="sheet-wrapper">
-    <!-- Running Top Header (Minimalist Editorial) -->
-    <header class="running-header">
-      <div class="running-header-left">
-        <span>QUANTUM ISING OPTIMIZER</span>
-        <span>•</span>
-        <span id="header-status-badge" style="color: var(--status-green);">[CIM HARDWARE: ONLINE]</span>
-      </div>
-      <div class="running-header-right">
-        <span>REF: QIO-CIM-ADVERSARIAL-2026</span>
-      </div>
-    </header>
 
-    <!-- Hero Title & Identity -->
-    <section class="hero-section">
-      <div>
-        <h1 class="main-title">Quantum Ising<br>Optimizer<span class="dot">.</span></h1>
-        <p class="main-subtitle">High-throughput remote execution gateway and job scheduler for the Coherent Ising Machine.</p>
-      </div>
+  <!-- ======================================================================
+       Top Navigation (Gray Sunderland Minimalist Right-Aligned Nav)
+       ====================================================================== -->
+  <header class="gray-header">
+    <div class="gray-header-brand">
+      <span>Quantum Ising Optimizer</span>
+      <span id="hardware-status-pill" class="hardware-pill-indicator">
+        <span class="indicator-dot"></span>
+        <span id="hw-status-text">CIM Hardware: ONLINE</span>
+      </span>
+    </div>
 
-      <div class="metadata-block">
-        <div>
-          <div class="meta-item">
-            <span class="meta-label">Physical Hardware IP</span>
-            <span class="meta-val">192.168.1.230:5050/run_ising</span>
+    <nav class="gray-header-nav">
+      <span class="gray-nav-link" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">Cavity: <strong id="stat-avg-latency" style="color:#000;">80 ms</strong></span>
+      <a href="/docs" target="_blank" class="gray-nav-link">API Docs ↗</a>
+      <a href="#index-section" class="gray-nav-link">Audit Index</a>
+      <div id="auth-nav-container">
+        <!-- Rendered dynamically by app.js: Sign In / Sign Up or User Badge -->
+        <button id="btn-open-auth" class="gray-nav-link" style="background:none; border:none; cursor:pointer;" onclick="openAuthModal('login')">Sign In</button>
+        <button id="btn-open-signup" class="gray-nav-link" style="background:none; border:none; font-weight:700; cursor:pointer; text-decoration:underline;" onclick="openAuthModal('signup')">Sign Up</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ======================================================================
+       Hero Section (Giant Display Typography "Quantum." / Bio)
+       ====================================================================== -->
+  <section class="gray-hero">
+    <div class="gray-hero-title-wrap">
+      <h1 class="gray-hero-title">Quantum.<span class="title-accent">↗</span></h1>
+    </div>
+
+    <div class="gray-hero-sub-grid">
+      <div class="gray-hero-bio">
+        Coherent Ising Machine Cloud Platform.<br>
+        High-throughput NP-hard combinatorial optimization, QUBO, and Ising graph solving directly on physical optical hardware.
+      </div>
+      <div class="gray-hero-telemetry-meta">
+        <div>HARDWARE BENCH: <strong id="stat-hw-latency">OPO Pulsed Cavity (Online)</strong></div>
+        <div>OPTICAL PHASE BIFURCATION: <strong>~80 ms (p50)</strong></div>
+        <div>QUEUE DEPTH: <strong id="stat-queue-depth">0</strong> • <span id="stat-total-jobs">Total Solves: 1</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hidden elements to preserve app.js telemetry metric references -->
+  <div style="display:none;">
+    <span id="stat-hw-status">Online</span>
+  </div>
+
+  <!-- ======================================================================
+       Showcase Grid (Browser Window + Mobile Device Frame)
+       Exact Mimic of Gray Sunderland's Project Presentation
+       ====================================================================== -->
+  <main class="showcase-grid">
+
+    <!-- 1. Mac Browser Window Frame (Problem Studio & Hardware Console) -->
+    <div class="window-frame-container">
+      <div class="window-frame">
+        <div class="window-header-bar">
+          <div class="window-dots">
+            <span class="window-dot"></span>
+            <span class="window-dot"></span>
+            <span class="window-dot"></span>
           </div>
-          <div class="meta-item">
-            <span class="meta-label">Cloud Edge Tunnel</span>
-            <span class="meta-val" id="meta-edge-tunnel">quantum-ising-optimizer.shashankg554.workers.dev</span>
-          </div>
+          <span class="window-title">quantum-ising-optimizer // formulation-console</span>
+          <span class="window-badge">OPO Pulsed Cavity</span>
         </div>
 
-        <div class="nav-actions" id="user-auth-actions">
-          <a href="/docs" target="_blank" class="btn btn-white btn-sm">API Docs</a>
-          <button class="btn btn-white btn-sm" onclick="openAuthModal('login')">Sign In</button>
-          <button class="btn btn-black btn-sm" onclick="openAuthModal('signup')">Sign Up</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Formal Attestation Callout (Benti Style) -->
-    <div class="attestation-callout">
-      <div class="attestation-title">HARDWARE AUDIT VERDICT & SCIENTIFIC ATTESTATION</div>
-      <p class="attestation-body">
-        Physical Coherent Ising Machine (CIM) verified operational on dedicated optical bench. Continuous analog phase pitchfork bifurcation solvers operative with sub-100 ms ground energy convergence for NP-hard quadratic optimization, dense covariance inversion, and combinatorial Ising graphs.
-      </p>
-    </div>
-
-    <!-- Section 1: Scorecard -->
-    <div class="section-header">
-      <h2 class="section-title">1. Real-Time Telemetry Scorecard</h2>
-      <span class="section-ref">SEC 1.0 • HARDWARE TELEMETRY</span>
-    </div>
-
-    <div class="scorecard-grid">
-      <div class="scorecard-cell">
-        <div class="sc-label">Hardware Status</div>
-        <div class="sc-val" id="sc-hw-status" style="color: var(--status-green);">ONLINE</div>
-        <div class="sc-sub" id="sc-hw-host">IP: 192.168.1.230:5050</div>
-      </div>
-
-      <div class="scorecard-cell">
-        <div class="sc-label">Cavity Bifurcation Time</div>
-        <div class="sc-val" id="sc-hw-latency">~80 ms</div>
-        <div class="sc-sub">Analog Optical Phase (p50)</div>
-      </div>
-
-      <div class="scorecard-cell">
-        <div class="sc-label">Active Queue Depth</div>
-        <div class="sc-val" id="sc-queue-depth">0</div>
-        <div class="sc-sub" id="sc-total-solves">Total Solves: 0</div>
-      </div>
-
-      <div class="scorecard-cell">
-        <div class="sc-label">Compute Wallet</div>
-        <div class="sc-val" id="sc-user-credits">--</div>
-        <div class="sc-sub" id="sc-user-tier">Sign in to activate</div>
-      </div>
-    </div>
-
-    <!-- Section 2: Workspace -->
-    <div class="section-header">
-      <h2 class="section-title">2. Combinatorial Optimization & Adversarial Studio</h2>
-      <span class="section-ref">SEC 2.0 • PROBLEM FORMULATION</span>
-    </div>
-
-    <div class="workspace-row">
-      <!-- Left Column: Problem Input -->
-      <div>
-        <div class="tab-bar">
-          <button class="tab-link active" onclick="switchTab('submit')">1. Submit Problem</button>
-          <button class="tab-link" onclick="switchTab('sdk')">2. Python SDK & API Keys</button>
-        </div>
-
-        <div id="tab-submit" class="tab-content active">
-          <div class="presets-container">
-            <span class="preset-title">Presets:</span>
-            <button class="preset-chip" onclick="loadPreset('max_cut_petersen')">Max-Cut (Petersen)</button>
-            <button class="preset-chip" onclick="loadPreset('number_partition')">Number Partition</button>
-            <button class="preset-chip" onclick="loadPreset('benti_neuromechanical_16')">Benti ARCAF 16-Ch</button>
+        <div class="window-content">
+          <!-- Presets Strip -->
+          <div class="presets-toolbar">
+            <span class="presets-label">Presets:</span>
+            <button type="button" class="btn-preset" onclick="loadPreset('max_cut_petersen')">Max-Cut (Petersen)</button>
+            <button type="button" class="btn-preset" onclick="loadPreset('number_partition')">Number Partition</button>
+            <button type="button" class="btn-preset" onclick="loadPreset('ising_spin_glass')">Spin-Glass (16-Spins)</button>
           </div>
 
-          <form id="problem-form" onsubmit="handleJobSubmit(event)">
-            <div class="form-row">
-              <div class="form-group flex-2">
-                <label for="job-label">Job Identifier / Label</label>
-                <input type="text" id="job-label" required value="Adversarial Inversion Sweep">
+          <!-- Problem Formulation Form -->
+          <form id="job-form" onsubmit="handleJobSubmit(event)">
+            <div class="params-row">
+              <div class="form-group">
+                <label for="job-label">Problem Label</label>
+                <input type="text" id="job-label" class="form-input" placeholder="e.g. Petersen Graph Ground State" required>
               </div>
-              <div class="form-group flex-1">
-                <label for="problem-type">Formulation</label>
-                <select id="problem-type" onchange="handleProblemTypeChange()">
-                  <option value="QUBO" selected>QUBO (Matrix Dict)</option>
-                  <option value="MAX_CUT">Graph Max-Cut</option>
-                  <option value="NUMBER_PARTITION">Number Partitioning</option>
-                  <option value="ISING">Ising (h, J)</option>
+
+              <div class="form-group">
+                <label for="problem-type">Model Type</label>
+                <select id="problem-type" class="form-select" onchange="handleProblemTypeChange()">
+                  <option value="MAX_CUT">MAX_CUT (Graph)</option>
+                  <option value="QUBO">QUBO (Quadratic)</option>
+                  <option value="NUMBER_PARTITION">NUMBER_PARTITION</option>
+                  <option value="ISING">ISING (Spin-Glass)</option>
                 </select>
               </div>
+
+              <div class="form-group">
+                <label for="job-shots">Cavity Sweeps</label>
+                <input type="number" id="job-shots" class="form-input" value="20" min="1" max="1000">
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="problem-data" id="problem-data-label">QUBO Matrix JSON {"i,j": weight}</label>
-              <textarea id="problem-data" rows="7" class="code-area" spellcheck="false" required></textarea>
+            <div class="editor-wrapper" style="margin-top:16px;">
+              <div class="editor-header">
+                <label id="problem-data-label" for="problem-data" style="font-family:var(--font-mono); font-size:0.72rem; font-weight:600; text-transform:uppercase;">Problem Graph / Matrix JSON</label>
+                <span id="problem-helper" class="editor-helper">Format: [[u, v, weight], ...]</span>
+              </div>
+              <textarea id="problem-data" class="form-textarea" spellcheck="false" required></textarea>
             </div>
 
-            <div class="form-row">
-              <div class="form-group flex-1">
-                <label for="job-shots">Cavity Sweeps (Shots)</label>
-                <input type="number" id="job-shots" min="1" max="1000" value="20">
+            <div class="execution-bar">
+              <div class="telemetry-chip">
+                <span>Phase Pitchfork Bifurcation (~65–90 ms)</span>
               </div>
-              <div class="form-group flex-1" style="display:flex; align-items:flex-end;">
-                <button type="submit" id="btn-submit" class="btn btn-black btn-full">
-                  Submit Sweep to CIM Hardware →
-                </button>
-              </div>
+              <button type="submit" id="btn-submit-job" class="btn-launch-solve">
+                <span>Launch Hardware Solve ↗</span>
+              </button>
             </div>
           </form>
         </div>
+      </div>
+      <div class="frame-caption">
+        <span>Launch problem formulation on OPO cavity bench ↗</span>
+      </div>
+    </div>
 
-        <div id="tab-sdk" class="tab-content">
-          <div class="sdk-container">
-            <label>Live API Key</label>
-            <div style="display:flex; gap:8px; margin-bottom:12px;">
-              <input type="password" id="display-api-key" readonly value="Sign in to generate key">
-              <button class="btn btn-white btn-sm" onclick="toggleApiKeyVisibility()">Show</button>
-              <button class="btn btn-black btn-sm" onclick="copyApiKey()">Copy</button>
-            </div>
-            <button class="btn btn-white btn-sm" onclick="handleGenerateNewKey()">+ Issue New API Key</button>
+    <!-- 2. Device Mobile Mockup Frame (Live Spin State & Hardware Telemetry) -->
+    <div class="device-frame-container">
+      <div class="phone-device">
+        <div class="phone-speaker-bar"></div>
 
-            <div style="margin-top:20px;">
-              <label>Google Colab / Python SDK Quickstart</label>
-              <pre class="sdk-code" id="sdk-code-snippet"><code>from sdk.cim_client import CIMClient
+        <div class="phone-screen-header">
+          <span class="phone-title">QIO Live State</span>
+          <span class="phone-pill">OPO CAVITY</span>
+        </div>
 
-client = CIMClient(api_key="YOUR_API_KEY", base_url="https://quantum-ising-optimizer.shashankg554.workers.dev")
+        <!-- Telemetry Card in Phone -->
+        <div class="phone-metric-block">
+          <div class="phone-metric-label">Compute Wallet</div>
+          <div id="stat-user-credits" class="phone-metric-value">--</div>
+          <div id="stat-user-tier" class="phone-metric-sub">Sign in to activate</div>
+        </div>
 
-Q = {(0, 0): -2.5, (1, 1): 2.5, (0, 1): 0.45}
-job = client.submit_qubo(Q, label="Colab Experiment", shots=20)
-result = job.wait_for_completion()
+        <!-- Discovered Ground State Spins Array -->
+        <div class="spins-inspector-wrap">
+          <div class="spins-inspector-label">
+            <span>Ground Spins</span>
+            <span id="inspector-energy-tag" style="color:var(--text-dim);">E₀: Pending</span>
+          </div>
 
-print("Solve Time:", result.execution_time_ms, "ms")
-print("Ground Energy:", result.energy)
-print("Optimal Spins:", result.spins)</code></pre>
-            </div>
+          <div id="phone-spins-container" class="spin-chips-grid">
+            <span class="spin-chip-pill spin-up">s₀ = +1</span>
+            <span class="spin-chip-pill spin-down">s₁ = -1</span>
+            <span class="spin-chip-pill spin-up">s₂ = +1</span>
+            <span class="spin-chip-pill spin-down">s₃ = -1</span>
+            <span class="spin-chip-pill spin-up">s₄ = +1</span>
+            <span class="spin-chip-pill spin-down">s₅ = -1</span>
+            <span class="spin-chip-pill spin-up">s₆ = +1</span>
+            <span class="spin-chip-pill spin-down">s₇ = -1</span>
+            <span class="spin-chip-pill spin-up">s₈ = +1</span>
+            <span class="spin-chip-pill spin-down">s₉ = -1</span>
+          </div>
+
+          <div style="margin-top:auto; padding-top:12px; border-top:var(--border-hair); font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+            <span>Mode: OPTICAL_CIM</span>
+            <span id="phone-last-latency">~80 ms</span>
           </div>
         </div>
       </div>
-
-      <!-- Right Column: Results & Verification Table -->
-      <div>
-        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
-          <label style="margin:0;">Recent Hardware Solves</label>
-          <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-muted);">POLL: 1.5s AUTO</span>
-        </div>
-
-        <div class="audit-table-wrapper">
-          <table class="audit-table">
-            <thead>
-              <tr>
-                <th>Job ID</th>
-                <th>Label</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Cavity Time</th>
-                <th>Energy (E0)</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="jobs-table-body">
-              <tr>
-                <td colspan="7" class="empty-row">No jobs recorded in active session. Dispatch a problem above.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="frame-caption">
+        <span>Real-time spin state inspector ↗</span>
       </div>
     </div>
-  </div>
 
-  <!-- Job Inspection Modal -->
-  <div id="job-modal" class="modal-overlay">
-    <div class="modal-box">
-      <div class="modal-title">
-        <span id="modal-title-text">Execution Telemetry</span>
-        <button class="modal-close-btn" onclick="closeJobModal()">✕</button>
-      </div>
-      <div id="modal-body-content"></div>
+  </main>
+
+  <!-- ======================================================================
+       Index Section (Gray Sunderland Table Style)
+       ====================================================================== -->
+  <section id="index-section" class="gray-index-section">
+    <div class="index-header-row">
+      <h2 class="index-title">Index / Hardware Solves.</h2>
+      <span class="index-meta">LIVE AUDIT FEED • SYNC INTERVAL: 1.5S</span>
     </div>
-  </div>
 
-  <!-- Auth Modal (Sign In / Sign Up) -->
+    <div class="gray-table-wrapper">
+      <table class="gray-table">
+        <thead>
+          <tr>
+            <th>Job ID</th>
+            <th>Problem Label</th>
+            <th>Model</th>
+            <th>Status</th>
+            <th>Cavity Time</th>
+            <th>Ground Energy (E₀)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="jobs-table-body">
+          <tr>
+            <td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted);">
+              Sign in or submit a problem to view optical execution history.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       Footer
+       ====================================================================== -->
+  <footer class="gray-footer">
+    <div>
+      QUANTUM ISING OPTIMIZER • COHERENT ISING MACHINE CLOUD PLATFORM
+    </div>
+    <div>
+      <a href="/docs" target="_blank">OpenAPI Swagger</a> • <a href="https://github.com/shashankg687/optiqon-cim-cloud" target="_blank">GitHub</a>
+    </div>
+  </footer>
+
+  <!-- ======================================================================
+       Modals: Authentication (Sign In / Sign Up)
+       ====================================================================== -->
   <div id="auth-modal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 440px;">
-      <div class="modal-title">
-        <span id="auth-modal-title">Account Access</span>
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title">Quantum Ising Optimizer // Access</span>
         <button class="modal-close-btn" onclick="closeAuthModal()">✕</button>
       </div>
+      <div class="modal-body">
+        <div class="auth-tabs">
+          <button id="auth-tab-login" class="auth-tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+          <button id="auth-tab-signup" class="auth-tab-btn" onclick="switchAuthTab('signup')">Sign Up (Free 100 Credits)</button>
+        </div>
 
-      <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid var(--border-black); padding-bottom:8px;">
-        <button id="auth-tab-btn-login" class="btn btn-black btn-sm" onclick="switchAuthMode('login')">Sign In</button>
-        <button id="auth-tab-btn-signup" class="btn btn-white btn-sm" onclick="switchAuthMode('signup')">Sign Up</button>
+        <!-- Login Form -->
+        <form id="form-login" class="auth-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" class="form-input" placeholder="researcher@quantum.org" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-auth-submit">Sign In to Platform ↗</button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="form-signup" class="auth-form hidden" onsubmit="handleSignup(event)">
+          <div class="form-group">
+            <label for="signup-name">Full Name</label>
+            <input type="text" id="signup-name" class="form-input" placeholder="Dr. Alice Smith" required>
+          </div>
+          <div class="form-group">
+            <label for="signup-email">Email Address</label>
+            <input type="email" id="signup-email" class="form-input" placeholder="alice@lab.edu" required>
+          </div>
+          <div class="form-group">
+            <label for="signup-org">Organization / Institution</label>
+            <input type="text" id="signup-org" class="form-input" placeholder="Quantum Computing Group" required>
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-auth-submit">Create Free Account (100 Solves) ↗</button>
+        </form>
       </div>
-
-      <form id="form-login" onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <label for="login-email">Email Address</label>
-          <input type="email" id="login-email" required placeholder="researcher@university.edu">
-        </div>
-        <div class="form-group">
-          <label for="login-password">Password</label>
-          <input type="password" id="login-password" required placeholder="••••••••">
-        </div>
-        <button type="submit" class="btn btn-black btn-full" style="margin-top:12px;">Sign In →</button>
-      </form>
-
-      <form id="form-signup" style="display:none;" onsubmit="handleSignup(event)">
-        <div class="form-group">
-          <label for="signup-name">Full Name</label>
-          <input type="text" id="signup-name" required placeholder="Dr. Jane Doe">
-        </div>
-        <div class="form-group">
-          <label for="signup-email">Email Address</label>
-          <input type="email" id="signup-email" required placeholder="jane@lab.org">
-        </div>
-        <div class="form-group">
-          <label for="signup-org">Organization / Institution</label>
-          <input type="text" id="signup-org" placeholder="Quantum Lab / University">
-        </div>
-        <div class="form-group">
-          <label for="signup-password">Password (min 6 chars)</label>
-          <input type="password" id="signup-password" minlength="6" required placeholder="••••••••">
-        </div>
-        <button type="submit" class="btn btn-black btn-full" style="margin-top:12px;">Create Account (100 Free Credits) →</button>
-      </form>
     </div>
   </div>
 
-  <script>
-    const API_BASE = window.location.origin;
-
-    let currentUser = null;
-    let authToken = localStorage.getItem("cim_auth_token") || null;
-    let currentApiKey = localStorage.getItem("cim_api_key") || null;
-    let presetsCache = {};
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      await fetchPresets();
-      await checkHardwareHealth();
-      setInterval(checkHardwareHealth, 5000);
-
-      if (authToken) {
-        await fetchUserProfile();
-      } else {
-        updateAuthNav();
-      }
-
-      loadPreset("max_cut_petersen");
-      pollJobsLoop();
-    });
-
-    async function checkHardwareHealth() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/hardware/status`);
-        if (!res.ok) return;
-        const data = await res.json();
-
-        const badge = document.getElementById("header-status-badge");
-        const scStatus = document.getElementById("sc-hw-status");
-        const scHost = document.getElementById("sc-hw-host");
-        const scLatency = document.getElementById("sc-hw-latency");
-        const scQueue = document.getElementById("sc-queue-depth");
-        const scSolves = document.getElementById("sc-total-solves");
-
-        if (data.hardware_online) {
-          badge.innerText = `[CIM HARDWARE: ONLINE • ${data.ping_latency_ms} MS]`;
-          badge.style.color = "var(--status-green)";
-          scStatus.innerText = "ONLINE";
-          scStatus.style.color = "var(--status-green)";
-          scHost.innerText = `IP: 192.168.1.230:5050 (${data.ping_latency_ms} ms)`;
-          scLatency.innerText = `${data.ping_latency_ms || 80.6} ms`;
-        } else {
-          badge.innerText = "[CIM HARDWARE: STANDBY / CALIBRATING]";
-          badge.style.color = "var(--status-yellow)";
-          scStatus.innerText = "STANDBY";
-          scStatus.style.color = "var(--status-yellow)";
-          scHost.innerText = "Calibrated Digital Twin Active";
-        }
-
-        scQueue.innerText = data.active_queue_depth || 0;
-        scSolves.innerText = `Total Solves: ${data.total_jobs_completed || 0}`;
-      } catch (err) {
-        console.warn("Hardware health check warning:", err);
-      }
-    }
-
-    async function fetchUserProfile() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/auth/me`, {
-          headers: { "Authorization": `Bearer ${authToken}` }
-        });
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-        const data = await res.json();
-        currentUser = data.user;
-
-        document.getElementById("sc-user-credits").innerText = currentUser.credits;
-        document.getElementById("sc-user-tier").innerText = `${currentUser.tier.toUpperCase()} TIER`;
-
-        if (data.api_keys && data.api_keys.length > 0) {
-          currentApiKey = currentApiKey || data.api_keys[0].key_id;
-          document.getElementById("display-api-key").value = currentApiKey;
-        }
-
-        updateAuthNav();
-        updateCodeSnippet();
-        refreshJobsTable();
-      } catch (err) {
-        console.error("Profile fetch error:", err);
-      }
-    }
-
-    function updateAuthNav() {
-      const container = document.getElementById("user-auth-actions");
-      if (currentUser) {
-        container.innerHTML = `
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-family:var(--font-mono); font-size:0.78rem; font-weight:700;">${currentUser.full_name}</span>
-            <span class="status-tag tag-completed">${currentUser.credits} CREDITS</span>
-            <button class="btn btn-white btn-sm" onclick="logout()">Sign Out</button>
-          </div>
-        `;
-      } else {
-        container.innerHTML = `
-          <a href="/docs" target="_blank" class="btn btn-white btn-sm">API Docs</a>
-          <button class="btn btn-white btn-sm" onclick="openAuthModal('login')">Sign In</button>
-          <button class="btn btn-black btn-sm" onclick="openAuthModal('signup')">Sign Up</button>
-        `;
-      }
-    }
-
-    function logout() {
-      authToken = null;
-      currentApiKey = null;
-      currentUser = null;
-      localStorage.removeItem("cim_auth_token");
-      localStorage.removeItem("cim_api_key");
-      updateAuthNav();
-      document.getElementById("sc-user-credits").innerText = "--";
-      document.getElementById("sc-user-tier").innerText = "Sign in to activate";
-      document.getElementById("jobs-table-body").innerHTML = `
-        <tr><td colspan="7" class="empty-row">Sign in to view your quantum execution history.</td></tr>
-      `;
-    }
-
-    function openAuthModal(mode) {
-      document.getElementById("auth-modal").classList.add("active");
-      switchAuthMode(mode);
-    }
-
-    function closeAuthModal() {
-      document.getElementById("auth-modal").classList.remove("active");
-    }
-
-    function switchAuthMode(mode) {
-      const btnLogin = document.getElementById("auth-tab-btn-login");
-      const btnSignup = document.getElementById("auth-tab-btn-signup");
-      const formLogin = document.getElementById("form-login");
-      const formSignup = document.getElementById("form-signup");
-
-      if (mode === "login") {
-        btnLogin.className = "btn btn-black btn-sm";
-        btnSignup.className = "btn btn-white btn-sm";
-        formLogin.style.display = "block";
-        formSignup.style.display = "none";
-      } else {
-        btnLogin.className = "btn btn-white btn-sm";
-        btnSignup.className = "btn btn-black btn-sm";
-        formLogin.style.display = "none";
-        formSignup.style.display = "block";
-      }
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || "Authentication failed");
-
-        authToken = data.access_token;
-        localStorage.setItem("cim_auth_token", authToken);
-        closeAuthModal();
-        await fetchUserProfile();
-      } catch (err) {
-        alert("Login Error: " + err.message);
-      }
-    }
-
-    async function handleSignup(e) {
-      e.preventDefault();
-      const full_name = document.getElementById("signup-name").value;
-      const email = document.getElementById("signup-email").value;
-      const organization = document.getElementById("signup-org").value;
-      const password = document.getElementById("signup-password").value;
-
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/auth/signup`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ full_name, email, organization, password })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || "Registration failed");
-
-        authToken = data.access_token;
-        currentApiKey = data.primary_api_key;
-        localStorage.setItem("cim_auth_token", authToken);
-        localStorage.setItem("cim_api_key", currentApiKey);
-
-        document.getElementById("display-api-key").value = currentApiKey;
-        closeAuthModal();
-        await fetchUserProfile();
-        alert(`Account registered successfully. 100 solve credits awarded.`);
-      } catch (err) {
-        alert("Signup Error: " + err.message);
-      }
-    }
-
-    async function fetchPresets() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/presets`);
-        if (res.ok) presetsCache = await res.json();
-      } catch (err) {
-        console.error("Presets error:", err);
-      }
-    }
-
-    function loadPreset(key) {
-      const preset = presetsCache[key];
-      if (!preset) return;
-
-      document.getElementById("job-label").value = preset.name;
-      const typeSelect = document.getElementById("problem-type");
-      typeSelect.value = preset.problem_type;
-
-      const dataArea = document.getElementById("problem-data");
-      if (preset.qubo) dataArea.value = JSON.stringify(preset.qubo, null, 2);
-      else if (preset.edges) dataArea.value = JSON.stringify(preset.edges, null, 2);
-      else if (preset.numbers) dataArea.value = JSON.stringify(preset.numbers, null, 2);
-      handleProblemTypeChange();
-    }
-
-    function handleProblemTypeChange() {
-      const type = document.getElementById("problem-type").value;
-      const label = document.getElementById("problem-data-label");
-      if (type === "QUBO") label.innerText = 'QUBO Matrix JSON {"i,j": weight}';
-      else if (type === "MAX_CUT") label.innerText = "Graph Edges JSON [[u, v, weight], ...]";
-      else if (type === "NUMBER_PARTITION") label.innerText = "Number List JSON [int, int, ...]";
-      else if (type === "ISING") label.innerText = 'Ising JSON {"linear": {...}, "quadratic": {...}}';
-    }
-
-    async function handleJobSubmit(e) {
-      e.preventDefault();
-
-      if (!authToken && !currentApiKey) {
-        openAuthModal("signup");
-        return;
-      }
-
-      const label = document.getElementById("job-label").value;
-      const problem_type = document.getElementById("problem-type").value;
-      const shots = parseInt(document.getElementById("job-shots").value, 10);
-      const rawData = document.getElementById("problem-data").value;
-
-      let parsedData;
-      try {
-        parsedData = JSON.parse(rawData);
-      } catch (err) {
-        alert("JSON Parse Error in Problem Coefficients: " + err.message);
-        return;
-      }
-
-      const payload = { label, problem_type, shots };
-      if (problem_type === "QUBO") payload.qubo = parsedData;
-      else if (problem_type === "MAX_CUT") payload.edges = parsedData;
-      else if (problem_type === "NUMBER_PARTITION") payload.numbers = parsedData;
-      else if (problem_type === "ISING") {
-        payload.linear = parsedData.linear || {};
-        payload.quadratic = parsedData.quadratic || {};
-      }
-
-      const btn = document.getElementById("btn-submit");
-      btn.disabled = true;
-      btn.innerText = "Executing on CIM Cavity...";
-
-      try {
-        const headers = { "Content-Type": "application/json" };
-        if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
-        else if (currentApiKey) headers["X-CIM-API-Key"] = currentApiKey;
-
-        const res = await fetch(`${API_BASE}/api/v1/jobs/submit`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || "Submission rejected");
-
-        await refreshJobsTable();
-        await fetchUserProfile();
-      } catch (err) {
-        alert("Job Submission Error: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Submit Sweep to CIM Hardware →";
-      }
-    }
-
-    async function pollJobsLoop() {
-      if (authToken || currentApiKey) {
-        await refreshJobsTable();
-      }
-      setTimeout(pollJobsLoop, 1500);
-    }
-
-    async function refreshJobsTable() {
-      if (!authToken && !currentApiKey) return;
-
-      try {
-        const headers = {};
-        if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
-        else if (currentApiKey) headers["X-CIM-API-Key"] = currentApiKey;
-
-        const res = await fetch(`${API_BASE}/api/v1/jobs?limit=25`, { headers });
-        if (!res.ok) return;
-        const data = await res.json();
-        const tbody = document.getElementById("jobs-table-body");
-
-        if (!data.jobs || data.jobs.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" class="empty-row">No jobs recorded in active session. Dispatch a problem above.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = data.jobs.map(j => {
-          let statusTag = `<span class="status-tag tag-queued">${j.status}</span>`;
-          if (j.status === "COMPLETED") statusTag = `<span class="status-tag tag-completed">COMPLETED</span>`;
-          else if (j.status === "RUNNING") statusTag = `<span class="status-tag tag-running">RUNNING</span>`;
-          else if (j.status === "FAILED") statusTag = `<span class="status-tag tag-failed">FAILED</span>`;
-
-          const timeVal = j.execution_time_ms ? `${j.execution_time_ms} ms` : "--";
-          const energyVal = j.result_energy !== null && j.result_energy !== undefined ? j.result_energy.toFixed(3) : "--";
-
-          return `
-            <tr>
-              <td><code>${j.job_id.substring(0, 10)}...</code></td>
-              <td><strong>${escapeHtml(j.label || "Untitled")}</strong></td>
-              <td>${j.problem_type}</td>
-              <td>${statusTag}</td>
-              <td>${timeVal}</td>
-              <td><code>${energyVal}</code></td>
-              <td><button class="btn btn-white btn-sm" onclick="viewJobDetails('${j.job_id}')">Inspect</button></td>
-            </tr>
-          `;
-        }).join("");
-      } catch (err) {
-        console.error("Job table refresh error:", err);
-      }
-    }
-
-    async function viewJobDetails(jobId) {
-      try {
-        const headers = {};
-        if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
-        else if (currentApiKey) headers["X-CIM-API-Key"] = currentApiKey;
-
-        const res = await fetch(`${API_BASE}/api/v1/jobs/${jobId}`, { headers });
-        if (!res.ok) throw new Error("Could not fetch job");
-        const j = await res.json();
-
-        document.getElementById("modal-title-text").innerText = `Telemetry: ${j.label || j.job_id}`;
-
-        let spinsHtml = "";
-        if (j.result_spins) {
-          spinsHtml = `
-            <div style="margin-top:16px;">
-              <label>Discovered Ground State Spins:</label>
-              <div class="spin-matrix">
-                ${Object.entries(j.result_spins).map(([k, v]) => `
-                  <span class="spin-item ${v > 0 ? 'spin-pos' : 'spin-neg'}">
-                    s<sub>${k}</sub> = ${v > 0 ? '+1' : '-1'}
-                  </span>
-                `).join("")}
-              </div>
-            </div>
-          `;
-        }
-
-        document.getElementById("modal-body-content").innerHTML = `
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-family:var(--font-mono); font-size:0.8rem; margin-bottom:14px;">
-            <div><strong>Status:</strong> ${j.status}</div>
-            <div><strong>Hardware:</strong> ${j.hardware_mode || 'Physical Bench'}</div>
-            <div><strong>Ground Energy:</strong> <code>${j.result_energy !== null ? j.result_energy : '--'}</code></div>
-            <div><strong>Cavity Latency:</strong> <code>${j.execution_time_ms ? j.execution_time_ms + ' ms' : '--'}</code></div>
-            <div><strong>Variables:</strong> N = ${j.num_variables}</div>
-            <div><strong>Timestamp:</strong> ${new Date(j.created_at).toLocaleTimeString()}</div>
-          </div>
-          ${spinsHtml}
-          ${j.error_message ? `<div style="color:var(--status-red); margin-top:12px;"><strong>Error:</strong> ${j.error_message}</div>` : ''}
-        `;
-
-        document.getElementById("job-modal").classList.add("active");
-      } catch (err) {
-        alert("Error loading job: " + err.message);
-      }
-    }
-
-    function closeJobModal() {
-      document.getElementById("job-modal").classList.remove("active");
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll(".tab-link").forEach(btn => btn.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-
-      if (tab === "submit") {
-        document.querySelector(".tab-link:first-child").classList.add("active");
-        document.getElementById("tab-submit").classList.add("active");
-      } else {
-        document.querySelector(".tab-link:last-child").classList.add("active");
-        document.getElementById("tab-sdk").classList.add("active");
-      }
-    }
-
-    function toggleApiKeyVisibility() {
-      const input = document.getElementById("display-api-key");
-      input.type = input.type === "password" ? "text" : "password";
-    }
-
-    function copyApiKey() {
-      const input = document.getElementById("display-api-key");
-      navigator.clipboard.writeText(input.value);
-      alert("API Key copied to clipboard.");
-    }
-
-    async function handleGenerateNewKey() {
-      if (!authToken) {
-        openAuthModal("login");
-        return;
-      }
-      const label = prompt("Enter a label for this API key:", "Python Client");
-      if (!label) return;
-
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/auth/api-keys`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${authToken}`
-          },
-          body: JSON.stringify({ label })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || "Key creation failed");
-
-        currentApiKey = data.api_key;
-        localStorage.setItem("cim_api_key", currentApiKey);
-        document.getElementById("display-api-key").value = currentApiKey;
-        updateCodeSnippet();
-        alert("New API Key generated.");
-      } catch (err) {
-        alert("Error: " + err.message);
-      }
-    }
-
-    function updateCodeSnippet() {
-      const key = currentApiKey || "YOUR_API_KEY";
-      const snippet = `from sdk.cim_client import CIMClient
-
-client = CIMClient(api_key="${key}", base_url="https://quantum-ising-optimizer.shashankg554.workers.dev")
-
-Q = {(0, 0): -2.5, (1, 1): 2.5, (0, 1): 0.45}
-job = client.submit_qubo(Q, label="Colab Experiment", shots=20)
-result = job.wait_for_completion()
-
-print("Solve Time:", result.execution_time_ms, "ms")
-print("Ground Energy:", result.energy)
-print("Optimal Spins:", result.spins)`;
-
-      document.getElementById("sdk-code-snippet").innerHTML = `<code>${escapeHtml(snippet)}</code>`;
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement("div");
-      div.innerText = text;
-      return div.innerHTML;
-    }
-  </script>
+  <!-- ======================================================================
+       Modals: Job Result Details Modal
+       ====================================================================== -->
+  <div id="job-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:640px;">
+      <div class="modal-header">
+        <span id="modal-job-title" class="modal-title">Job Details</span>
+        <button class="modal-close-btn" onclick="document.getElementById('job-modal').classList.remove('active')">✕</button>
+      </div>
+      <div id="modal-job-body" class="modal-body">
+        <!-- Rendered dynamically by app.js viewJobDetails -->
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key storage field -->
+  <input type="hidden" id="display-api-key">
+
+  <script src="/portal/app.js"></script>
 </body>
 </html>

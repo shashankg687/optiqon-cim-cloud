@@ -306,8 +306,8 @@ def get_presets():
             "problem_type": "NUMBER_PARTITION",
             "numbers": [19, 17, 13, 9, 6]
         },
-        "benti_neuromechanical_16": {
-            "name": "Benti ARCAF 16-Channel Sensor Covariance Inversion",
+        "ising_spin_glass": {
+            "name": "Frustrated Spin-Glass (16 Spins)",
             "problem_type": "QUBO",
             "qubo": {
                 "0,0": -2.5, "1,1": 2.5, "2,2": -2.5, "3,3": 2.5,

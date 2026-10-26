@@ -104,7 +104,7 @@ class CIMJobScheduler:
 
         return {
             "status": "ONLINE" if self.hardware_online else "STANDBY / CALIBRATING",
-            "hardware_url": self.hardware_url,
+            "hardware_url": "Protected (OPO Cavity Bench)",
             "hardware_online": self.hardware_online,
             "ping_latency_ms": self.last_ping_latency_ms,
             "active_queue_depth": queue_depth,
