@@ -1,5 +1,5 @@
 """
-End-to-End Verification & Example Usage Script for Optiqon CIM Cloud
+End-to-End Verification & Example Usage Script for Quantum Ising Optimizer
 """
 
 import sys
@@ -15,7 +15,7 @@ API_BASE = "http://127.0.0.1:8000"
 
 def main():
     print("=" * 70)
-    print("   OPTIQON CIM CLOUD PLATFORM - CLIENT VERIFICATION SUITE")
+    print("   QUANTUM ISING OPTIMIZER - CLIENT VERIFICATION SUITE")
     print("=" * 70)
     
     # 1. Register a test user or authenticate
@@ -65,7 +65,7 @@ def main():
     client = CIMClient(api_key=api_key, base_url=API_BASE)
 
     # 3. Check Physical Hardware Health
-    print("\n[3/5] Querying Optiqon CIM Physical Hardware Status...")
+    print("\n[3/5] Querying CIM Physical Hardware Status...")
     hw = client.get_hardware_status()
     print(f"      [OK] Status: {hw['status']}")
     print(f"      [OK] Target URL: {hw['hardware_url']}")

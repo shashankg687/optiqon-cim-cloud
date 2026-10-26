@@ -1,5 +1,5 @@
 """
-Optiqon CIM Cloud Platform - FastAPI Application Gateway
+Quantum Ising Optimizer Cloud Platform - FastAPI Application Gateway
 """
 
 import os
@@ -27,8 +27,8 @@ from server.scheduler import scheduler
 
 # Initialize FastAPI App
 app = FastAPI(
-    title="Optiqon CIM Cloud API",
-    description="High-Throughput Cloud Gateway & Job Scheduler for the Optiqon Coherent Ising Machine",
+    title="Quantum Ising Optimizer API",
+    description="High-Throughput Remote Gateway & Job Scheduler for the Coherent Ising Machine (CIM)",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -340,4 +340,4 @@ def serve_portal_root():
     index_file = os.path.join(PORTAL_DIR, "index.html")
     if os.path.exists(index_file):
         return FileResponse(index_file)
-    return {"status": "Optiqon CIM Cloud Gateway is Online", "docs": "/docs", "portal": "/portal"}
+    return {"status": "Quantum Ising Optimizer Gateway is Online", "docs": "/docs", "portal": "/portal"}

@@ -1,5 +1,5 @@
 """
-Optiqon CIM Cloud Platform - Authentication & Authorization Engine
+Quantum Ising Optimizer Cloud Platform - Authentication & Authorization Engine
 """
 
 import os

@@ -1,9 +1,9 @@
-# Product Design & Architecture (PDA): Optiqon CIM Cloud Platform
+# Product Design & Architecture (PDA): Quantum Ising Optimizer Cloud Platform
 
 > **Document Version:** 1.0.0  
 > **Classification:** Technical Architecture & Product Specification  
-> **System Name:** Optiqon CIM Cloud (Q-CIM Cloud Gateway)  
-> **Physical Hardware Target:** Optiqon Coherent Ising Machine (OPO Cavity Bench at `http://192.168.1.230:5050/run_ising`)  
+> **System Name:** Quantum Ising Optimizer (QIO Cloud Gateway)  
+> **Physical Hardware Target:** Coherent Ising Machine (OPO Cavity Bench at `http://192.168.1.230:5050/run_ising`)  
 > **Lead Architect:** Dr. Shashank Gupta, Ph.D.  
 > **Date:** October 2026  
 
@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary & Vision
 
-The **Optiqon CIM Cloud Platform** bridges physical optical computing hardware with global cloud developers, quantum researchers, and enterprise cybersecurity engineers. Built as an open, high-throughput cloud gateway analogous to *IBM Quantum Platform* and *D-Wave Leap*, this system allows authenticated users worldwide to submit NP-hard combinatorial optimization, Quadratic Unconstrained Binary Optimization (QUBO), and Ising spin-glass problems directly to the physical Coherent Ising Machine (CIM) located at `192.168.1.230:5050`.
+The **Quantum Ising Optimizer Cloud Platform** bridges physical optical computing hardware with global cloud developers, quantum researchers, and enterprise cybersecurity engineers. Built as an open, high-throughput cloud gateway analogous to *IBM Quantum Platform* and *D-Wave Leap*, this system allows authenticated users worldwide to submit NP-hard combinatorial optimization, Quadratic Unconstrained Binary Optimization (QUBO), and Ising spin-glass problems directly to the physical Coherent Ising Machine (CIM) located at `192.168.1.230:5050`.
 
 ### 1.1 Core Value Proposition
 * **Frictionless Onboarding:** Instant user registration, API key generation (`cim_live_...`), and starter compute credits.
@@ -69,7 +69,7 @@ The **Optiqon CIM Cloud Platform** bridges physical optical computing hardware w
 │                              PHYSICAL QUANTUM HARDWARE                                          │
 │                                                                                                 │
 │   ┌─────────────────────────────────────────────────────────────────────────────────────────┐   │
-│   │                     QUANFLUENCE OPTIQON COHERENT ISING MACHINE                          │   │
+│   │                          COHERENT ISING MACHINE (CIM)                                   │   │
 │   │   • IP Address: http://192.168.1.230:5050/run_ising                                     │   │
 │   │   • Optical Parametric Oscillator (OPO) Pulsed Fiber Ring Cavity                        │   │
 │   │   • Phase Pitchfork Bifurcation (~65 - 80 ms per ground energy solve)                   │   │
@@ -147,7 +147,7 @@ The persistence layer uses a high-performance SQLite engine with **Write-Ahead L
 
 ## 5. Job Scheduler & Hardware Mutex Protocol
 
-Because the optical cavity of the Optiqon CIM is an analog physical resonator operating at pulsed laser rates, multiple jobs cannot occupy the optical cavity simultaneously. The scheduler implements a **Serial Lock Pattern**:
+Because the optical cavity of the Coherent Ising Machine (CIM) is an analog physical resonator operating at pulsed laser rates, multiple jobs cannot occupy the optical cavity simultaneously. The scheduler implements a **Serial Lock Pattern**:
 
 1. **Submission:** When a user calls `/jobs/submit`, the problem is validated, credits are debited, and the job is recorded as `QUEUED` in SQLite.
 2. **Prioritization:** The background scheduler worker orders the queue by:

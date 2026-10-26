@@ -1,5 +1,5 @@
 /**
- * Optiqon CIM Cloud - Frontend Client Logic
+ * Quantum Ising Optimizer - Frontend Client Logic
  */
 
 const API_BASE = window.location.origin;
@@ -528,7 +528,7 @@ client = CIMClient(api_key="${key}", base_url="${API_BASE}")
 # Define QUBO
 Q = {(0, 0): -2.5, (1, 1): 2.5, (0, 1): 0.45}
 
-# Dispatch directly to physical Optiqon CIM
+# Dispatch directly to physical Coherent Ising Machine (CIM)
 job = client.submit_qubo(Q, label="Colab Optimization Run")
 result = job.wait_for_completion()
 

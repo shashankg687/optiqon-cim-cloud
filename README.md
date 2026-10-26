@@ -1,6 +1,6 @@
-# Optiqon CIM Cloud Platform (Q-CIM Cloud)
+# Quantum Ising Optimizer (QIO Cloud Platform)
 
-> **High-Throughput Public Cloud Gateway & Job Scheduler for the Optiqon Coherent Ising Machine**  
+> **High-Throughput Public Cloud Gateway & Job Scheduler for the Coherent Ising Machine**  
 > **Physical Hardware Interface:** `http://192.168.1.230:5050/run_ising`  
 > **Lead Architect:** Dr. Shashank Gupta, Ph.D.  
 
@@ -8,7 +8,7 @@
 
 ## 1. Overview
 
-The **Optiqon CIM Cloud Platform** provides authenticated, multi-tenant remote access to the physical **Quanfluence Optiqon Coherent Ising Machine (CIM)**. Researchers, developers, and enterprise security auditors can register, receive free compute credits, obtain persistent API keys, and dispatch combinatorial optimization (QUBO, Ising, Max-Cut, and Number Partitioning) workloads from any machine, Google Colab, or automated script globally.
+The **Quantum Ising Optimizer Cloud Platform** provides authenticated, multi-tenant remote access to the physical **Coherent Ising Machine (CIM)**. Researchers, developers, and enterprise security auditors can register, receive free compute credits, obtain persistent API keys, and dispatch combinatorial optimization (QUBO, Ising, Max-Cut, and Number Partitioning) workloads from any machine, Google Colab, or automated script globally.
 
 ### Key Capabilities
 * **Full Multi-Tenancy:** User registration (`/api/v1/auth/signup`), JWT authentication, and secure `cim_live_...` API keys.
@@ -78,7 +78,7 @@ client = CIMClient(api_key="cim_live_...", base_url="http://127.0.0.1:8000")
 
 # 2. Check physical optical hardware status
 hw = client.get_hardware_status()
-print("Optiqon CIM Status:", hw["status"], f"({hw['ping_latency_ms']} ms)")
+print("CIM Hardware Status:", hw["status"], f"({hw['ping_latency_ms']} ms)")
 
 # 3. Formulate optimization problem
 Q = {

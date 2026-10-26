@@ -1,5 +1,5 @@
 """
-Optiqon CIM Cloud Platform - Data Schemas & Validation Models
+Quantum Ising Optimizer Cloud Platform - Data Schemas & Validation Models
 """
 
 from pydantic import BaseModel, EmailStr, Field
@@ -89,4 +89,4 @@ class HardwareStatusResponse(BaseModel):
     ping_latency_ms: float
     active_queue_depth: int
     total_jobs_completed: int
-    hardware_description: str = "Quanfluence Optiqon Coherent Ising Machine (OPO Pulsed Cavity)"
+    hardware_description: str = "Coherent Ising Machine (OPO Pulsed Cavity)"

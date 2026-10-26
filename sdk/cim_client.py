@@ -1,5 +1,5 @@
 """
-Optiqon CIM Cloud - Official Python Client SDK
+Quantum Ising Optimizer Cloud - Official Python Client SDK
 Author: Dr. Shashank Gupta, Ph.D.
 """
 
@@ -46,7 +46,7 @@ class CIMJob:
 
     def wait_for_completion(self, timeout_seconds: float = 60.0, poll_interval: float = 0.5) -> CIMResult:
         """
-        Blocks until the job completes on the Optiqon CIM or times out.
+        Blocks until the job completes on the CIM or times out.
         """
         start = time.time()
         while time.time() - start < timeout_seconds:
@@ -66,7 +66,7 @@ class CIMJob:
 
 class CIMClient:
     """
-    Client for interacting with the Optiqon CIM Cloud Gateway.
+    Client for interacting with the Quantum Ising Optimizer Cloud Gateway.
     """
     def __init__(self, api_key: Optional[str] = None, token: Optional[str] = None, base_url: str = "http://localhost:8000"):
         self.base_url = base_url.rstrip("/")
@@ -97,7 +97,7 @@ class CIMClient:
         return r.json()
 
     def get_hardware_status(self) -> Dict[str, Any]:
-        """Returns the real-time physical status of the Optiqon CIM bench."""
+        """Returns the real-time physical status of the CIM bench."""
         return self._get("/api/v1/hardware/status")
 
     def submit_qubo(self, Q: Dict[Any, float], label: Optional[str] = None, shots: int = 20) -> CIMJob:

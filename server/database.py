@@ -1,5 +1,5 @@
 """
-Optiqon CIM Cloud Platform - Persistence Layer
+Quantum Ising Optimizer Cloud Platform - Persistence Layer
 Dual Adapter: Supports Supabase Hosted PostgreSQL & Local SQLite
 """
 

@@ -1,5 +1,5 @@
 """
-Optiqon CIM Cloud Platform - Gateway Server Launcher
+Quantum Ising Optimizer Cloud Platform - Gateway Server Launcher
 """
 
 import sys
@@ -12,7 +12,7 @@ from server.config import SERVER_HOST, SERVER_PORT, CIM_HARDWARE_URL
 
 def main():
     print("=" * 75)
-    print("      OPTIQON COHERENT ISING MACHINE (CIM) CLOUD GATEWAY")
+    print("       QUANTUM ISING OPTIMIZER (CIM) CLOUD GATEWAY")
     print("=" * 75)
     print(f" * Target Hardware Bench:  {CIM_HARDWARE_URL}")
     print(f" * Local Gateway URL:      http://127.0.0.1:{SERVER_PORT}")

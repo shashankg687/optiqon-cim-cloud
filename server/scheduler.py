@@ -1,5 +1,5 @@
 """
-Optiqon CIM Cloud Platform - Intelligent Job Scheduler & Hardware Worker Engine
+Quantum Ising Optimizer Cloud Platform - Intelligent Job Scheduler & Hardware Worker Engine
 """
 
 import time
@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(na
 class CIMJobScheduler:
     """
     Manages asynchronous queueing, hardware mutex access, and execution
-    for the physical Quanfluence Optiqon Coherent Ising Machine.
+    for the physical Coherent Ising Machine (CIM).
     """
     _instance = None
     _lock = threading.Lock()
@@ -59,7 +59,7 @@ class CIMJobScheduler:
         self.health_thread = threading.Thread(target=self._health_monitor_loop, daemon=True, name="CIM-Health-Monitor")
         self.health_thread.start()
         
-        logger.info("Optiqon CIM Job Scheduler & Hardware Worker started.")
+        logger.info("Quantum Ising Optimizer Scheduler & Hardware Worker started.")
 
     def stop(self):
         """Stops background threads cleanly."""
@@ -68,7 +68,7 @@ class CIMJobScheduler:
             self.worker_thread.join(timeout=2.0)
         if self.health_thread:
             self.health_thread.join(timeout=2.0)
-        logger.info("Optiqon CIM Job Scheduler stopped.")
+        logger.info("Quantum Ising Optimizer Scheduler stopped.")
 
     # --------------------------------------------------------------------------
     # Health Monitoring
@@ -109,7 +109,7 @@ class CIMJobScheduler:
             "ping_latency_ms": self.last_ping_latency_ms,
             "active_queue_depth": queue_depth,
             "total_jobs_completed": total_completed,
-            "hardware_description": "Quanfluence Optiqon Coherent Ising Machine (OPO Pulsed Cavity)"
+            "hardware_description": "Coherent Ising Machine (OPO Pulsed Cavity)"
         }
 
     # --------------------------------------------------------------------------
@@ -219,7 +219,7 @@ class CIMJobScheduler:
 
     def _execute_job(self, job: Dict[str, Any]):
         job_id = job["job_id"]
-        logger.info(f"Dispatching Job [{job_id}] (Type: {job['problem_type']}) to Optiqon CIM...")
+        logger.info(f"Dispatching Job [{job_id}] (Type: {job['problem_type']}) to Coherent Ising Machine (CIM)...")
         
         try:
             bqm, num_vars = self.compile_to_bqm(job["problem_type"], job["problem_data"])

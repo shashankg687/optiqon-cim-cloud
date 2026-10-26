@@ -1,5 +1,5 @@
 """
-Optiqon CIM Cloud Platform - Configuration
+Quantum Ising Optimizer Cloud Platform - Configuration
 """
 
 import os
@@ -35,7 +35,7 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 
 # Security & Authentication
-JWT_SECRET = os.getenv("JWT_SECRET", "optiqon-cim-cloud-secret-key-2026-production-token")
+JWT_SECRET = os.getenv("JWT_SECRET", "quantum-ising-optimizer-secret-key-2026-production-token")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24 * 7 # 7 days validity
 
