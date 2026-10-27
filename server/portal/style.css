@@ -843,9 +843,44 @@ body {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .gray-footer a {
   color: #000000;
   text-decoration: underline;
+}
+
+.visitor-counter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1.5px solid #111111;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.visitor-pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--status-green);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(10, 135, 84, 0.6);
+  animation: visitorPulse 2s infinite ease-in-out;
+}
+
+@keyframes visitorPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+.visitor-text strong {
+  color: #000000;
+  font-weight: 700;
 }

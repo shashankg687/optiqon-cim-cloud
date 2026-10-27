@@ -13,6 +13,7 @@ let presetsCache = {};
 
 // Initialize on Load
 document.addEventListener("DOMContentLoaded", async () => {
+  await fetchVisitorCount();
   await fetchPresets();
   await checkHardwareHealth();
   setInterval(checkHardwareHealth, 5000);
@@ -25,6 +26,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Load default preset into form
   loadPreset("max_cut_petersen");
+
+  // Setup Drag and Drop
+  setupDragAndDrop();
 
   // Start job polling loop
   pollJobsLoop();
@@ -597,4 +601,111 @@ function escapeHtml(text) {
   const div = document.createElement("div");
   div.innerText = text;
   return div.innerHTML;
+}
+
+// -----------------------------------------------------------------------------
+// Visitor Counter & File Upload Engine
+// -----------------------------------------------------------------------------
+async function fetchVisitorCount() {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/stats/visitor-count`);
+    if (res.ok) {
+      const data = await res.json();
+      const el = document.getElementById("visitor-count-number");
+      if (el && data.visitor_count) {
+        el.innerText = data.visitor_count.toLocaleString("en-US", { minimumIntegerDigits: 6 });
+      }
+    }
+  } catch (err) {
+    console.warn("Visitor count fetch error:", err);
+  }
+}
+
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  processUploadedFile(file);
+}
+
+function processUploadedFile(file) {
+  const reader = new FileReader();
+  const fileName = file.name;
+  
+  reader.onload = function(evt) {
+    const text = evt.target.result.trim();
+    const labelInput = document.getElementById("job-label");
+    const typeSelect = document.getElementById("problem-type");
+    const dataArea = document.getElementById("problem-data");
+
+    // Prepopulate label with clean file name
+    labelInput.value = fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+
+    if (fileName.endsWith(".json")) {
+      try {
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) {
+          if (parsed.length > 0 && Array.isArray(parsed[0])) {
+            typeSelect.value = "MAX_CUT";
+          } else {
+            typeSelect.value = "NUMBER_PARTITION";
+          }
+        } else if (typeof parsed === "object") {
+          if (parsed.linear || parsed.quadratic) {
+            typeSelect.value = "ISING";
+          } else {
+            typeSelect.value = "QUBO";
+          }
+        }
+        dataArea.value = JSON.stringify(parsed, null, 2);
+        handleProblemTypeChange();
+      } catch (err) {
+        alert("JSON format error: " + err.message);
+      }
+    } else if (fileName.endsWith(".csv") || fileName.endsWith(".txt")) {
+      // Auto-detect coordinate list: u,v or u,v,weight
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith("#"));
+      if (lines.length > 0) {
+        const sampleParts = lines[0].split(/[,\s\t]+/);
+        if (sampleParts.length >= 2 && sampleParts.length <= 3 && !isNaN(Number(sampleParts[0]))) {
+          // Graph edge list
+          const edges = lines.map(line => line.split(/[,\s\t]+/).map(Number));
+          typeSelect.value = "MAX_CUT";
+          dataArea.value = JSON.stringify(edges, null, 2);
+          handleProblemTypeChange();
+        } else {
+          dataArea.value = text;
+        }
+      }
+    } else {
+      dataArea.value = text;
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+function setupDragAndDrop() {
+  const area = document.getElementById("problem-data");
+  if (!area) return;
+
+  area.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    area.style.borderColor = "#000000";
+    area.style.background = "#ffffff";
+  });
+
+  area.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    area.style.borderColor = "";
+    area.style.background = "";
+  });
+
+  area.addEventListener("drop", (e) => {
+    e.preventDefault();
+    area.style.borderColor = "";
+    area.style.background = "";
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processUploadedFile(e.dataTransfer.files[0]);
+    }
+  });
 }

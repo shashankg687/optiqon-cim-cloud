@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from server.config import SERVER_HOST, SERVER_PORT, DEFAULT_SIGNUP_CREDITS
-from server.database import init_db, get_db
+from server.database import init_db, get_db, get_and_increment_visitor_count
 from server.auth import (
     hash_password, verify_password, create_jwt_token, 
     generate_api_key, get_current_user
@@ -59,6 +59,11 @@ def on_shutdown():
 @app.get("/api/v1/hardware/status", response_model=HardwareStatusResponse, tags=["Hardware"])
 def get_hardware_status():
     return scheduler.get_hardware_status()
+
+@app.get("/api/v1/stats/visitor-count", tags=["Platform"])
+def get_visitor_count():
+    count = get_and_increment_visitor_count()
+    return {"visitor_count": count}
 
 # --------------------------------------------------------------------------
 # Authentication Endpoints

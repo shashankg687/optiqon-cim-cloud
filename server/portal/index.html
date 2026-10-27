@@ -87,6 +87,8 @@
             <button type="button" class="btn-preset" onclick="loadPreset('max_cut_petersen')">Max-Cut (Petersen)</button>
             <button type="button" class="btn-preset" onclick="loadPreset('number_partition')">Number Partition</button>
             <button type="button" class="btn-preset" onclick="loadPreset('ising_spin_glass')">Spin-Glass (16-Spins)</button>
+            <button type="button" class="btn-preset" style="background:#ffffff;" onclick="document.getElementById('qubo-file-input').click()">⇪ Upload File (.json, .csv)</button>
+            <input type="file" id="qubo-file-input" style="display:none;" accept=".json,.csv,.txt" onchange="handleFileUpload(event)">
           </div>
 
           <!-- Problem Formulation Form -->
@@ -224,8 +226,12 @@
        Footer
        ====================================================================== -->
   <footer class="gray-footer">
-    <div>
-      QUANTUM ISING OPTIMIZER • COHERENT ISING MACHINE CLOUD PLATFORM
+    <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+      <span>QUANTUM ISING OPTIMIZER • COHERENT ISING MACHINE CLOUD PLATFORM</span>
+      <div class="visitor-counter-badge">
+        <span class="visitor-pulse-dot"></span>
+        <span class="visitor-text">VISITOR NO. <strong id="visitor-count-number">001,042</strong></span>
+      </div>
     </div>
     <div>
       <a href="/docs" target="_blank">OpenAPI Swagger</a> • <a href="https://github.com/shashankg687/optiqon-cim-cloud" target="_blank">GitHub</a>

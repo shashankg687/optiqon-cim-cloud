@@ -153,7 +153,33 @@ def init_db():
             );
             """)
 
+        # 5. Platform Stats Table (Visitor Counter)
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS platform_stats (
+            stat_key TEXT PRIMARY KEY,
+            stat_value INTEGER DEFAULT 0
+        );
+        """)
+
         logger.info(f"Database initialized successfully (Engine: {'Supabase PostgreSQL' if USE_POSTGRES else 'SQLite'}).")
+
+def get_and_increment_visitor_count() -> int:
+    """Atomically increments and returns the platform visitor count."""
+    try:
+        with get_db() as conn:
+            row = conn.execute("SELECT stat_value FROM platform_stats WHERE stat_key = ?", ("visitor_count",)).fetchone()
+            if not row:
+                initial_count = 1042
+                conn.execute("INSERT INTO platform_stats (stat_key, stat_value) VALUES (?, ?)", ("visitor_count", initial_count))
+                return initial_count
+            else:
+                current_val = row["stat_value"] if isinstance(row, dict) else row[0]
+                new_count = current_val + 1
+                conn.execute("UPDATE platform_stats SET stat_value = ? WHERE stat_key = ?", (new_count, "visitor_count"))
+                return new_count
+    except Exception as e:
+        logger.error(f"Error updating visitor count: {e}")
+        return 1042
 
 if __name__ == "__main__":
     init_db()
