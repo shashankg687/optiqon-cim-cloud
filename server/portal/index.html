@@ -328,7 +328,10 @@
         <div>
           <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
             <label style="font-family:var(--font-mono); font-size:0.74rem; font-weight:700; text-transform:uppercase;">Direct Python Code Snippet</label>
-            <button class="btn-preset" style="font-size:0.7rem; padding:2px 8px;" onclick="copyCodeSnippet()">Copy Code</button>
+            <div style="display:flex; gap:6px;">
+              <a href="/cim_cloud.py" download="cim_cloud.py" class="btn-preset" style="font-size:0.7rem; padding:2px 8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; color:#111;">Download cim_cloud.py 📥</a>
+              <button class="btn-preset" style="font-size:0.7rem; padding:2px 8px;" onclick="copyCodeSnippet()">Copy Code</button>
+            </div>
           </div>
           <pre id="sdk-code-snippet" style="background:var(--bg-editor); border:1.5px solid #111; padding:12px; border-radius:4px; font-family:var(--font-mono); font-size:0.75rem; overflow-x:auto; line-height:1.45; color:#111; max-height:220px;"></pre>
         </div>

@@ -340,9 +340,24 @@ def serve_js():
         return FileResponse(js_path, media_type="application/javascript")
     raise HTTPException(status_code=404, detail="JS not found")
 
+@app.get("/cim_cloud.py")
+@app.get("/api/v1/sdk/cim_cloud.py")
+@app.get("/api/v1/sdk/download")
+def serve_sdk_file():
+    sdk_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cim_cloud.py")
+    if os.path.exists(sdk_path):
+        return FileResponse(
+            sdk_path,
+            media_type="text/x-python",
+            filename="cim_cloud.py",
+            headers={"Content-Disposition": "attachment; filename=cim_cloud.py"}
+        )
+    raise HTTPException(status_code=404, detail="SDK file not found")
+
 @app.get("/")
 def serve_portal_root():
     index_file = os.path.join(PORTAL_DIR, "index.html")
     if os.path.exists(index_file):
         return FileResponse(index_file)
     return {"status": "Quantum Ising Optimizer Gateway is Online", "docs": "/docs", "portal": "/portal"}
+

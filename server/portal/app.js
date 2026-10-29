@@ -573,15 +573,20 @@ async function handleGenerateNewKey() {
 
 function updateCodeSnippet() {
   const key = currentApiKey || "YOUR_API_KEY";
-  const snippet = `from cim_cloud import CIMClient
+  const snippet = `# 1. Download SDK if not in your directory:
+# !curl -s -O ${API_BASE}/cim_cloud.py
+# (Or click the 'Download cim_cloud.py' button above)
 
+from cim_cloud import CIMClient
+
+# 2. Connect to the Quantum Ising Optimizer
 client = CIMClient(api_key="${key}", base_url="${API_BASE}")
 
-# Define QUBO
+# 3. Define QUBO Hamiltonian
 Q = {(0, 0): -2.5, (1, 1): 2.5, (0, 1): 0.45}
 
-# Dispatch directly to physical Coherent Ising Machine (CIM)
-job = client.submit_qubo(Q, label="Colab Optimization Run")
+# 4. Dispatch directly to physical optical CIM
+job = client.submit_qubo(Q, label="Optimization Run")
 result = job.wait_for_completion()
 
 print("Optical Solve Latency:", result.execution_time_ms, "ms")
