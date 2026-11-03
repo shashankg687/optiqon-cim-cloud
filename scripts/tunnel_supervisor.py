@@ -95,41 +95,53 @@ async function handleRequest(request) {{
             return False
 
 def run_tunnel():
-    """Runs cloudflared tunnel, captures live URL, updates Cloudflare Worker, and monitors health."""
-    cmd = [CLOUDFLARED_PATH, "tunnel", "--url", "http://127.0.0.1:8000"]
-    logger.info(f"Starting cloudflared: {' '.join(cmd)}")
+    """Runs cloudflared tunnel, captures live URL via logfile, updates Cloudflare Worker, and monitors health."""
+    cloudflared_log = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cloudflared.log")
+    os.makedirs(os.path.dirname(cloudflared_log), exist_ok=True)
+    if os.path.exists(cloudflared_log):
+        try:
+            os.remove(cloudflared_log)
+        except Exception:
+            pass
+
+    cmd = [CLOUDFLARED_PATH, "tunnel", "--url", "http://127.0.0.1:8000", "--logfile", cloudflared_log]
+    logger.info(f"Starting cloudflared with logfile: {cloudflared_log}")
     
-    proc = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1
-    )
+    proc = subprocess.Popen(cmd)
     
     tunnel_url = None
     start_time = time.time()
     
+    # Poll log file for trycloudflare URL (up to 30 seconds)
+    for _ in range(60):
+        time.sleep(0.5)
+        if proc.poll() is not None:
+            logger.error(f"cloudflared exited unexpectedly with code {proc.returncode}")
+            break
+        if os.path.exists(cloudflared_log):
+            try:
+                with open(cloudflared_log, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+                    match = re.search(r"https://[a-zA-Z0-9\-]+\.trycloudflare\.com", content)
+                    if match:
+                        tunnel_url = match.group(0)
+                        logger.info(f"==> NEW TUNNEL DISCOVERED: {tunnel_url} <==")
+                        success = update_worker_script(tunnel_url)
+                        if success:
+                            logger.info(f"==> GATEWAY READY: https://{WORKER_NAME}.shashankg554.workers.dev <==")
+                        break
+            except Exception:
+                pass
+
+    if not tunnel_url:
+        logger.warning("Could not extract tunnel URL within timeout")
+
+    # Monitor process health
     while True:
-        line = proc.stdout.readline()
-        if not line:
+        time.sleep(2)
+        if proc.poll() is not None:
+            logger.warning("cloudflared stopped, will restart...")
             break
-        print(line, end="", flush=True)
-        
-        if not tunnel_url:
-            match = re.search(r"https://[a-zA-Z0-9\-]+\.trycloudflare\.com", line)
-            if match:
-                tunnel_url = match.group(0)
-                logger.info(f"==> NEW TUNNEL DISCOVERED: {tunnel_url} <==")
-                success = update_worker_script(tunnel_url)
-                if success:
-                    logger.info(f"==> GATEWAY READY: https://{WORKER_NAME}.shashankg554.workers.dev <==")
-        
-        # Check for error indicators in log
-        if "Unauthorized: Tunnel not found" in line or "failed to dial" in line.lower():
-            logger.warning("Tunnel error detected, will restart...")
-            break
-            
         # Re-cycle tunnel every 20 hours to prevent Cloudflare 24h hard cutoff
         if time.time() - start_time > 20 * 3600:
             logger.info("Tunnel 20-hour rotation window reached. Cycling tunnel...")
