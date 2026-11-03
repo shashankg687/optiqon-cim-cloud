@@ -14,15 +14,21 @@ from server.config import SERVER_HOST, SERVER_PORT, CIM_HARDWARE_URL, CLOUDFLARE
 def start_tunnel_background():
     """Starts the Cloudflare tunnel supervisor in a background process."""
     supervisor_script = os.path.join(os.path.dirname(__file__), "scripts", "tunnel_supervisor.py")
+    log_file = os.path.join(os.path.dirname(__file__), "data", "tunnel_supervisor.log")
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
     if os.path.exists(supervisor_script):
         try:
+            log_fp = open(log_file, "a", encoding="utf-8")
             p = subprocess.Popen(
                 [sys.executable, supervisor_script],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stdout=log_fp,
+                stderr=subprocess.STDOUT,
+                cwd=os.path.dirname(__file__),
+                env=os.environ.copy()
             )
-            print(f" * Edge Cloudflare Tunnel: CONNECTED (Supervisor PID: {p.pid})")
+            print(f" * Edge Cloudflare Tunnel: LAUNCHED (Supervisor PID: {p.pid})")
             print(f" * Public Worker Gateway:  {CLOUDFLARE_WORKER_URL}")
+            print(f" * Tunnel Log Output:     {log_file}")
             return p
         except Exception as e:
             print(f" * Edge Cloudflare Tunnel: Auto-start failed ({e})")

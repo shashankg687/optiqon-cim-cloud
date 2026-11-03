@@ -95,14 +95,9 @@ async function handleRequest(request) {{
             return False
 
 def run_tunnel():
-    """Runs cloudflared tunnel, supports permanent named tunnel token or dynamic fallback."""
-    if CLOUDFLARE_TUNNEL_TOKEN:
-        cmd = [CLOUDFLARED_PATH, "tunnel", "run", "--token", CLOUDFLARE_TUNNEL_TOKEN]
-        logger.info("Starting cloudflared in PERMANENT NAMED TUNNEL mode...")
-    else:
-        cmd = [CLOUDFLARED_PATH, "tunnel", "--url", "http://127.0.0.1:8000"]
-        logger.info("Starting cloudflared in DYNAMIC QUICK TUNNEL mode...")
-    logger.info(f"Command: {cmd[0]} {' '.join(cmd[1:3])} ...")
+    """Runs cloudflared tunnel, captures live URL, updates Cloudflare Worker, and monitors health."""
+    cmd = [CLOUDFLARED_PATH, "tunnel", "--url", "http://127.0.0.1:8000"]
+    logger.info(f"Starting cloudflared: {' '.join(cmd)}")
     
     proc = subprocess.Popen(
         cmd,
@@ -121,20 +116,22 @@ def run_tunnel():
             break
         print(line, end="", flush=True)
         
-        if not CLOUDFLARE_TUNNEL_TOKEN and not tunnel_url:
+        if not tunnel_url:
             match = re.search(r"https://[a-zA-Z0-9\-]+\.trycloudflare\.com", line)
             if match:
                 tunnel_url = match.group(0)
                 logger.info(f"==> NEW TUNNEL DISCOVERED: {tunnel_url} <==")
-                update_worker_script(tunnel_url)
+                success = update_worker_script(tunnel_url)
+                if success:
+                    logger.info(f"==> GATEWAY READY: https://{WORKER_NAME}.shashankg554.workers.dev <==")
         
         # Check for error indicators in log
         if "Unauthorized: Tunnel not found" in line or "failed to dial" in line.lower():
             logger.warning("Tunnel error detected, will restart...")
             break
             
-        # For dynamic quick tunnels, cycle every 20 hours to prevent Cloudflare 24h hard cutoff
-        if not CLOUDFLARE_TUNNEL_TOKEN and (time.time() - start_time > 20 * 3600):
+        # Re-cycle tunnel every 20 hours to prevent Cloudflare 24h hard cutoff
+        if time.time() - start_time > 20 * 3600:
             logger.info("Tunnel 20-hour rotation window reached. Cycling tunnel...")
             break
 
