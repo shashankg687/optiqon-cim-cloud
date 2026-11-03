@@ -28,6 +28,7 @@ if os.path.exists(env_file):
 
 CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID", "a8b4615741899637a8281b36013b167f")
 CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "")
+CLOUDFLARE_TUNNEL_TOKEN = os.getenv("CLOUDFLARE_TUNNEL_TOKEN", "")
 WORKER_NAME = os.getenv("CLOUDFLARE_WORKER_NAME", "quantum-ising-optimizer")
 CLOUDFLARED_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cloudflared.exe")
 
@@ -94,9 +95,14 @@ async function handleRequest(request) {{
             return False
 
 def run_tunnel():
-    """Runs cloudflared tunnel, captures URL, updates worker, and monitors health."""
-    cmd = [CLOUDFLARED_PATH, "tunnel", "--url", "http://127.0.0.1:8000"]
-    logger.info(f"Starting cloudflared: {' '.join(cmd)}")
+    """Runs cloudflared tunnel, supports permanent named tunnel token or dynamic fallback."""
+    if CLOUDFLARE_TUNNEL_TOKEN:
+        cmd = [CLOUDFLARED_PATH, "tunnel", "run", "--token", CLOUDFLARE_TUNNEL_TOKEN]
+        logger.info("Starting cloudflared in PERMANENT NAMED TUNNEL mode...")
+    else:
+        cmd = [CLOUDFLARED_PATH, "tunnel", "--url", "http://127.0.0.1:8000"]
+        logger.info("Starting cloudflared in DYNAMIC QUICK TUNNEL mode...")
+    logger.info(f"Command: {cmd[0]} {' '.join(cmd[1:3])} ...")
     
     proc = subprocess.Popen(
         cmd,
@@ -115,7 +121,7 @@ def run_tunnel():
             break
         print(line, end="", flush=True)
         
-        if not tunnel_url:
+        if not CLOUDFLARE_TUNNEL_TOKEN and not tunnel_url:
             match = re.search(r"https://[a-zA-Z0-9\-]+\.trycloudflare\.com", line)
             if match:
                 tunnel_url = match.group(0)
@@ -127,8 +133,8 @@ def run_tunnel():
             logger.warning("Tunnel error detected, will restart...")
             break
             
-        # Re-cycle tunnel every 20 hours to prevent Cloudflare 24h hard cutoff
-        if time.time() - start_time > 20 * 3600:
+        # For dynamic quick tunnels, cycle every 20 hours to prevent Cloudflare 24h hard cutoff
+        if not CLOUDFLARE_TUNNEL_TOKEN and (time.time() - start_time > 20 * 3600):
             logger.info("Tunnel 20-hour rotation window reached. Cycling tunnel...")
             break
 

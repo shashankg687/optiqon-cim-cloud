@@ -43,6 +43,12 @@ JWT_EXPIRATION_HOURS = 24 * 7 # 7 days validity
 DEFAULT_SIGNUP_CREDITS = 100
 MAX_VARIABLES_PER_JOB = 1024
 
+# Cloudflare Edge & Tunnel Configuration
+CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID", "a8b4615741899637a8281b36013b167f")
+CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "")
+CLOUDFLARE_TUNNEL_TOKEN = os.getenv("CLOUDFLARE_TUNNEL_TOKEN", "")
+CLOUDFLARE_WORKER_URL = os.getenv("CLOUDFLARE_WORKER_URL", "https://quantum-ising-optimizer.shashankg554.workers.dev")
+
 # Server Host & Port
 SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
 SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
