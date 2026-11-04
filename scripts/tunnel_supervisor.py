@@ -33,66 +33,19 @@ WORKER_NAME = os.getenv("CLOUDFLARE_WORKER_NAME", "quantum-ising-optimizer")
 CLOUDFLARED_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cloudflared.exe")
 
 
-def update_worker_script(target_url: str):
-    """Updates Cloudflare Worker proxy target to the new tunnel origin."""
-    logger.info(f"Updating Cloudflare Worker proxy target to: {target_url}")
-    worker_js = f"""addEventListener('fetch', event => {{
-  event.respondWith(handleRequest(event.request));
-}});
+# Import Edge Worker Compiler
+try:
+    from scripts.build_edge_worker import deploy_worker
+except ImportError:
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from scripts.build_edge_worker import deploy_worker
 
-async function handleRequest(request) {{
-  const url = new URL(request.url);
-  const targetHost = '{target_url.replace("https://", "")}';
-  const targetUrl = '{target_url}' + url.pathname + url.search;
-  
-  const modifiedHeaders = new Headers(request.headers);
-  modifiedHeaders.set('Host', targetHost);
-  
-  const init = {{
-    method: request.method,
-    headers: modifiedHeaders,
-    redirect: 'follow'
-  }};
-  
-  if (request.method !== 'GET' && request.method !== 'HEAD') {{
-    init.body = await request.clone().arrayBuffer();
-  }}
-  
-  try {{
-    const response = await fetch(targetUrl, init);
-    const newHeaders = new Headers(response.headers);
-    newHeaders.set('Access-Control-Allow-Origin', '*');
-    newHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    newHeaders.set('Access-Control-Allow-Headers', '*');
-    
-    return new Response(response.body, {{
-      status: response.status,
-      statusText: response.statusText,
-      headers: newHeaders
-    }});
-  }} catch (err) {{
-    return new Response('Edge Proxy Gateway Error: ' + err.message, {{ status: 502 }});
-  }}
-}}
-"""
-    api_url = f"https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/workers/scripts/{WORKER_NAME}"
-    req = urllib.request.Request(
-        api_url,
-        data=worker_js.encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
-            "Content-Type": "application/javascript"
-        },
-        method="PUT"
-    )
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        result = json.loads(resp.read().decode())
-        if result.get("success"):
-            logger.info("Cloudflare Worker script updated successfully!")
-            return True
-        else:
-            logger.error(f"Worker update error: {result}")
-            return False
+
+def update_worker_script(target_url: str):
+    """Updates Cloudflare Worker with embedded UI + live tunnel API proxy."""
+    logger.info(f"Deploying edge-native worker synchronized with origin: {target_url}")
+    return deploy_worker(target_url)
 
 def run_tunnel():
     """Runs cloudflared tunnel, captures live URL via logfile, updates Cloudflare Worker, and monitors health."""
