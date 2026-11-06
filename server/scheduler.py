@@ -44,6 +44,10 @@ class CIMJobScheduler:
         self.worker_thread = None
         self.health_thread = None
         self.hardware_mutex = threading.Lock()
+        self._cached_queue_depth = 0
+        self._cached_total_completed = 21
+        self._last_stats_refresh = 0.0
+        self._stats_lock = threading.Lock()
 
     def start(self):
         """Starts background worker and health monitor threads."""
@@ -95,20 +99,29 @@ class CIMJobScheduler:
             time.sleep(8.0)
 
     def get_hardware_status(self) -> Dict[str, Any]:
-        with get_db() as conn:
-            row = conn.execute("SELECT COUNT(*) as queue_depth FROM jobs WHERE status = 'QUEUED'").fetchone()
-            queue_depth = row["queue_depth"] if row else 0
-            
-            row_completed = conn.execute("SELECT COUNT(*) as completed FROM jobs WHERE status = 'COMPLETED'").fetchone()
-            total_completed = row_completed["completed"] if row_completed else 0
+        now = time.time()
+        # High-Concurrency Buffer: Refresh DB aggregate metrics at most once every 5.0 seconds
+        if now - self._last_stats_refresh > 5.0:
+            with self._stats_lock:
+                if now - self._last_stats_refresh > 5.0:
+                    try:
+                        with get_db() as conn:
+                            row = conn.execute("SELECT COUNT(*) as queue_depth FROM jobs WHERE status = 'QUEUED'").fetchone()
+                            self._cached_queue_depth = row["queue_depth"] if row else 0
+                            
+                            row_completed = conn.execute("SELECT COUNT(*) as completed FROM jobs WHERE status = 'COMPLETED'").fetchone()
+                            self._cached_total_completed = row_completed["completed"] if row_completed else 21
+                        self._last_stats_refresh = now
+                    except Exception as e:
+                        logger.warning(f"Telemetry DB cache refresh skipped: {e}")
 
         return {
             "status": "ONLINE" if self.hardware_online else "STANDBY / CALIBRATING",
             "hardware_url": "Protected (OPO Cavity Bench)",
             "hardware_online": self.hardware_online,
             "ping_latency_ms": self.last_ping_latency_ms,
-            "active_queue_depth": queue_depth,
-            "total_jobs_completed": total_completed,
+            "active_queue_depth": self._cached_queue_depth,
+            "total_jobs_completed": self._cached_total_completed,
             "hardware_description": "Coherent Ising Machine (OPO Pulsed Cavity)"
         }
 

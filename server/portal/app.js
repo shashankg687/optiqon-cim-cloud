@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   await fetchVisitorCount();
   await fetchPresets();
   await checkHardwareHealth();
-  setInterval(checkHardwareHealth, 5000);
+  
+  // High-Concurrency Visibility-Aware Telemetry Poller (10s active, 30s backgrounded)
+  scheduleHardwareHealth();
 
   if (authToken) {
     await fetchUserProfile();
@@ -32,6 +34,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Start job polling loop
   pollJobsLoop();
+});
+
+function scheduleHardwareHealth() {
+  const delay = document.hidden ? 30000 : 10000;
+  setTimeout(async () => {
+    if (!document.hidden) {
+      await checkHardwareHealth();
+    }
+    scheduleHardwareHealth();
+  }, delay);
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    checkHardwareHealth();
+  }
 });
 
 // -----------------------------------------------------------------------------
@@ -366,13 +384,24 @@ async function handleJobSubmit(e) {
 }
 
 // -----------------------------------------------------------------------------
-// Job Polling & Table Rendering
+// Job Polling & Table Rendering (Adaptive Concurrency Loop)
 // -----------------------------------------------------------------------------
+let hasActiveJobs = false;
+
 async function pollJobsLoop() {
   if (authToken || currentApiKey) {
-    await refreshJobsTable();
+    if (!document.hidden) {
+      await refreshJobsTable();
+    }
   }
-  setTimeout(pollJobsLoop, 1500);
+  // Adaptive Polling: 2s if jobs in-flight, 8s if idle, 25s if backgrounded
+  let delay = 8000;
+  if (document.hidden) {
+    delay = 25000;
+  } else if (hasActiveJobs) {
+    delay = 2000;
+  }
+  setTimeout(pollJobsLoop, delay);
 }
 
 async function refreshJobsTable() {
@@ -390,9 +419,12 @@ async function refreshJobsTable() {
     const tbody = document.getElementById("jobs-table-body");
 
     if (!data.jobs || data.jobs.length === 0) {
+      hasActiveJobs = false;
       tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted);">No jobs found. Dispatch a problem above!</td></tr>`;
       return;
     }
+
+    hasActiveJobs = data.jobs.some(j => j.status === "QUEUED" || j.status === "RUNNING");
 
     // If there's a recent completed job, update phone inspector
     const latestCompleted = data.jobs.find(j => j.status === "COMPLETED");
@@ -456,6 +488,8 @@ function getStatusBadge(status) {
   return `<span class="status-tag">${status}</span>`;
 }
 
+let currentActiveJob = null;
+
 async function viewJobDetails(jobId) {
   try {
     const headers = {};
@@ -465,14 +499,24 @@ async function viewJobDetails(jobId) {
     const res = await fetch(`${API_BASE}/api/v1/jobs/${jobId}`, { headers });
     if (!res.ok) throw new Error("Could not fetch job details");
     const j = await res.json();
+    currentActiveJob = j;
 
     document.getElementById("modal-job-title").innerText = `Job: ${j.label || j.job_id}`;
     
     let spinsHtml = "";
     if (j.result_spins) {
+      const spinCount = Object.keys(j.result_spins).length;
       spinsHtml = `
         <div style="margin-top:16px;">
-          <label style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; text-transform:uppercase; margin-bottom:8px; display:block;">Discovered Ground State Spins:</label>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+            <label style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; text-transform:uppercase;">
+              Discovered Ground State Spins (${spinCount}):
+            </label>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-preset" style="font-size:0.7rem; padding:3px 10px; cursor:pointer;" onclick="exportCurrentJobSpins('json')">Export JSON 📥</button>
+              <button class="btn-preset" style="font-size:0.7rem; padding:3px 10px; cursor:pointer;" onclick="exportCurrentJobSpins('csv')">Export CSV 📥</button>
+            </div>
+          </div>
           <div class="spin-chips-grid">
             ${Object.entries(j.result_spins).map(([k, v]) => `
               <span class="spin-chip-pill ${v > 0 ? 'spin-up' : 'spin-down'}">
@@ -505,6 +549,34 @@ async function viewJobDetails(jobId) {
 
 function closeJobModal() {
   document.getElementById("job-modal").classList.remove("active");
+}
+
+function exportCurrentJobSpins(format) {
+  if (!currentActiveJob || !currentActiveJob.result_spins) {
+    alert("No spins data available to export.");
+    return;
+  }
+  const spins = currentActiveJob.result_spins;
+  const jobId = currentActiveJob.job_id || "job";
+  let dataStr = "";
+  let filename = `${jobId}_spins.${format}`;
+
+  if (format === "json") {
+    dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(spins, null, 2));
+  } else if (format === "csv") {
+    let csv = "variable_index,spin_value\n";
+    for (const [k, v] of Object.entries(spins)) {
+      csv += `${k},${v}\n`;
+    }
+    dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  }
+
+  const downloadAnchor = document.createElement("a");
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", filename);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
 }
 
 // -----------------------------------------------------------------------------

@@ -89,6 +89,12 @@ const CIM_CLOUD_PY = {sdk_json};
 const PRESETS = {presets_json};
 const TARGET_ORIGIN = {origin_json};
 
+// In-Memory Edge Cache (High-Concurrency Accelerator)
+let telemetryCache = null;
+let telemetryCacheTime = 0;
+let visitorCache = null;
+let visitorCacheTime = 0;
+
 addEventListener('fetch', event => {{
   event.respondWith(handleRequest(event.request));
 }});
@@ -98,7 +104,7 @@ async function handleRequest(request) {{
   const path = url.pathname;
 
   // 1. Root & Portal Assets - Served 100% from Edge Memory (Zero Error 1016)
-  if (path === '/' || path === '/index.html' || path === '/portal/' || path === '/portal/index.html') {{
+  if (path === '' || path === '/' || path === '/index.html' || path === '/portal' || path === '/portal/' || path === '/portal/index.html') {{
     return new Response(INDEX_HTML, {{
       headers: {{
         'Content-Type': 'text/html; charset=utf-8',
@@ -111,7 +117,7 @@ async function handleRequest(request) {{
     return new Response(STYLE_CSS, {{
       headers: {{
         'Content-Type': 'text/css; charset=utf-8',
-        'Cache-Control': 'public, max-age=3600'
+        'Cache-Control': 'public, max-age=60, must-revalidate'
       }}
     }});
   }}
@@ -120,7 +126,7 @@ async function handleRequest(request) {{
     return new Response(APP_JS, {{
       headers: {{
         'Content-Type': 'application/javascript; charset=utf-8',
-        'Cache-Control': 'public, max-age=3600'
+        'Cache-Control': 'public, max-age=0, must-revalidate'
       }}
     }});
   }}
@@ -145,6 +151,19 @@ async function handleRequest(request) {{
     }});
   }}
 
+  if (path === '/favicon.ico') {{
+    return new Response(null, {{ status: 204 }});
+  }}
+
+  if (path === '/docs' || path === '/docs/' || path === '/portal/docs') {{
+    return new Response(getDocsHtml(), {{
+      headers: {{
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600'
+      }}
+    }});
+  }}
+
   // 2. CORS Preflight
   if (request.method === 'OPTIONS') {{
     return new Response(null, {{
@@ -158,7 +177,34 @@ async function handleRequest(request) {{
     }});
   }}
 
-  // 3. API Requests Forwarding
+  // 3. High-Concurrency In-Memory Edge Cache for Polling Endpoints
+  if (path === '/api/v1/hardware/status' && request.method === 'GET') {{
+    const now = Date.now();
+    if (telemetryCache && (now - telemetryCacheTime < 4000)) {{
+      return new Response(telemetryCache, {{
+        headers: {{
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'X-Edge-Cache': 'HIT-RAM'
+        }}
+      }});
+    }}
+  }}
+
+  if (path === '/api/v1/stats/visitor-count' && request.method === 'GET') {{
+    const now = Date.now();
+    if (visitorCache && (now - visitorCacheTime < 5000)) {{
+      return new Response(visitorCache, {{
+        headers: {{
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'X-Edge-Cache': 'HIT-RAM'
+        }}
+      }});
+    }}
+  }}
+
+  // 4. API Requests Forwarding
   if (!TARGET_ORIGIN) {{
     return getFallbackResponse(path);
   }}
@@ -181,12 +227,32 @@ async function handleRequest(request) {{
 
   try {{
     const response = await fetch(targetUrl, init);
+
+    // CRITICAL RESILIENCE: If backend tunnel is down, expired or returns Cloudflare Error 1016 (530)
+    // NEVER leak 530 / Error 1016 to the user browser. Return graceful fallback response instead.
+    if (!response || response.status === 530 || response.status === 502 || response.status === 504) {{
+      return getFallbackResponse(path, 'Origin tunnel unreachable (status: ' + (response ? response.status : 'None') + ')');
+    }}
+
+    const bodyText = await response.text();
+    if (response.status === 200) {{
+      const now = Date.now();
+      if (path === '/api/v1/hardware/status') {{
+        telemetryCache = bodyText;
+        telemetryCacheTime = now;
+      }} else if (path === '/api/v1/stats/visitor-count') {{
+        visitorCache = bodyText;
+        visitorCacheTime = now;
+      }}
+    }}
+
     const newHeaders = new Headers(response.headers);
     newHeaders.set('Access-Control-Allow-Origin', '*');
     newHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     newHeaders.set('Access-Control-Allow-Headers', '*');
+    newHeaders.set('X-Edge-Cache', 'MISS');
 
-    return new Response(response.body, {{
+    return new Response(bodyText, {{
       status: response.status,
       statusText: response.statusText,
       headers: newHeaders
@@ -194,6 +260,32 @@ async function handleRequest(request) {{
   }} catch (err) {{
     return getFallbackResponse(path, err.message);
   }}
+}}
+
+function getDocsHtml() {{
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <title>Quantum Ising Optimizer - API Reference</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+<script>
+window.onload = () => {{
+  window.ui = SwaggerUIBundle({{
+    url: '/openapi.json',
+    dom_id: '#swagger-ui',
+    presets: [SwaggerUIBundle.presets.apis],
+    layout: 'BaseLayout'
+  }});
+}};
+</script>
+</body>
+</html>`;
 }}
 
 function getFallbackResponse(path, errMsg = '') {{
@@ -208,6 +300,40 @@ function getFallbackResponse(path, errMsg = '') {{
       hardware_description: 'Coherent Ising Machine (OPO Pulsed Cavity)'
     }}), {{
       status: 200,
+      headers: {{
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }}
+    }});
+  }}
+
+  if (path === '/api/v1/stats/visitor-count') {{
+    return new Response(JSON.stringify({{
+      visitor_count: 1420
+    }}), {{
+      status: 200,
+      headers: {{
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }}
+    }});
+  }}
+
+  if (path === '/api/v1/jobs' || path.startsWith('/api/v1/jobs')) {{
+    return new Response(JSON.stringify([]), {{
+      status: 200,
+      headers: {{
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }}
+    }});
+  }}
+
+  if (path === '/api/v1/auth/me') {{
+    return new Response(JSON.stringify({{
+      detail: 'Not authenticated'
+    }}), {{
+      status: 401,
       headers: {{
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
@@ -262,5 +388,6 @@ def deploy_worker(target_origin: str = "") -> bool:
 
 if __name__ == "__main__":
     import sys
-    target = sys.argv[1] if len(sys.argv) > 1 else "https://cups-postcard-philosophy-december.trycloudflare.com"
+    target = sys.argv[1] if len(sys.argv) > 1 else ""
     deploy_worker(target)
+

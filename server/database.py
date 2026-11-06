@@ -4,8 +4,10 @@ Dual Adapter: Supports Supabase Hosted PostgreSQL & Local SQLite
 """
 
 import os
+import time
 import sqlite3
 import logging
+import threading
 from contextlib import contextmanager
 from server.config import DATABASE_URL, DB_PATH
 
@@ -14,14 +16,32 @@ logger = logging.getLogger("cim_cloud.database")
 # Check if PostgreSQL is available
 USE_POSTGRES = bool(DATABASE_URL and DATABASE_URL.startswith("postgres"))
 
+_pg_pool = None
+_pool_lock = threading.Lock()
+
 if USE_POSTGRES:
     try:
         import psycopg2
         import psycopg2.extras
-        logger.info("Initializing Supabase PostgreSQL database adapter...")
+        import psycopg2.pool
+        logger.info("Initializing Supabase PostgreSQL database adapter with connection pooling...")
     except ImportError:
         logger.warning("psycopg2 not found, falling back to SQLite.")
         USE_POSTGRES = False
+
+def get_pg_pool():
+    global _pg_pool
+    if _pg_pool is None:
+        with _pool_lock:
+            if _pg_pool is None:
+                logger.info("Spawning ThreadedConnectionPool (minconn=2, maxconn=25) for Supabase PostgreSQL...")
+                _pg_pool = psycopg2.pool.ThreadedConnectionPool(
+                    minconn=2,
+                    maxconn=25,
+                    dsn=DATABASE_URL,
+                    connect_timeout=10
+                )
+    return _pg_pool
 
 class PGConnWrapper:
     """Wraps psycopg2 connection to mimic sqlite3 row-dict execution."""
@@ -45,24 +65,42 @@ class PGConnWrapper:
         self.conn.rollback()
 
     def close(self):
-        self.conn.close()
+        pass # Managed by connection pool
 
 @contextmanager
 def get_db():
     if USE_POSTGRES:
-        conn = psycopg2.connect(DATABASE_URL, connect_timeout=10)
-        wrapper = PGConnWrapper(conn)
+        pool = get_pg_pool()
+        conn = pool.getconn()
         try:
+            if conn.closed != 0:
+                pool.putconn(conn, close=True)
+                conn = pool.getconn()
+            wrapper = PGConnWrapper(conn)
             yield wrapper
             wrapper.commit()
         except Exception as e:
-            wrapper.rollback()
+            try:
+                conn.rollback()
+            except Exception:
+                pass
             raise e
         finally:
-            wrapper.close()
+            try:
+                pool.putconn(conn)
+            except Exception:
+                pass
     else:
         conn = sqlite3.connect(DB_PATH, timeout=30.0)
         conn.row_factory = sqlite3.Row
+        try:
+            yield conn
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
         conn.execute("PRAGMA journal_mode=DELETE;")
         conn.execute("PRAGMA synchronous=NORMAL;")
         conn.execute("PRAGMA busy_timeout=15000;")
@@ -163,23 +201,42 @@ def init_db():
 
         logger.info(f"Database initialized successfully (Engine: {'Supabase PostgreSQL' if USE_POSTGRES else 'SQLite'}).")
 
+_visitor_count_cache = None
+_visitor_lock = threading.Lock()
+_last_visitor_flush = 0.0
+
 def get_and_increment_visitor_count() -> int:
-    """Atomically increments and returns the platform visitor count."""
-    try:
-        with get_db() as conn:
-            row = conn.execute("SELECT stat_value FROM platform_stats WHERE stat_key = ?", ("visitor_count",)).fetchone()
-            if not row:
-                initial_count = 1042
-                conn.execute("INSERT INTO platform_stats (stat_key, stat_value) VALUES (?, ?)", ("visitor_count", initial_count))
-                return initial_count
-            else:
-                current_val = row["stat_value"] if isinstance(row, dict) else row[0]
-                new_count = current_val + 1
-                conn.execute("UPDATE platform_stats SET stat_value = ? WHERE stat_key = ?", (new_count, "visitor_count"))
-                return new_count
-    except Exception as e:
-        logger.error(f"Error updating visitor count: {e}")
-        return 1042
+    """Atomically increments and returns the platform visitor count with high-concurrency RAM buffer."""
+    global _visitor_count_cache, _last_visitor_flush
+    now = time.time()
+    with _visitor_lock:
+        if _visitor_count_cache is None:
+            try:
+                with get_db() as conn:
+                    row = conn.execute("SELECT stat_value FROM platform_stats WHERE stat_key = ?", ("visitor_count",)).fetchone()
+                    if not row:
+                        _visitor_count_cache = 1042
+                        conn.execute("INSERT INTO platform_stats (stat_key, stat_value) VALUES (?, ?)", ("visitor_count", 1042))
+                    else:
+                        _visitor_count_cache = row["stat_value"] if isinstance(row, dict) else row[0]
+            except Exception as e:
+                logger.error(f"Error initializing visitor count: {e}")
+                _visitor_count_cache = 1042
+            _last_visitor_flush = now
+
+        _visitor_count_cache += 1
+        current_count = _visitor_count_cache
+
+        # Flush to DB at most once every 5 seconds to prevent connection saturation
+        if now - _last_visitor_flush > 5.0:
+            _last_visitor_flush = now
+            try:
+                with get_db() as conn:
+                    conn.execute("UPDATE platform_stats SET stat_value = ? WHERE stat_key = ?", (current_count, "visitor_count"))
+            except Exception as e:
+                logger.warning(f"Deferred visitor count flush: {e}")
+
+        return current_count
 
 if __name__ == "__main__":
     init_db()
