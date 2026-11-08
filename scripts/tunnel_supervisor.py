@@ -51,14 +51,12 @@ def run_tunnel():
     """Runs cloudflared tunnel, captures live URL via logfile, updates Cloudflare Worker, and monitors health."""
     cloudflared_log = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cloudflared.log")
     os.makedirs(os.path.dirname(cloudflared_log), exist_ok=True)
-    if os.path.exists(cloudflared_log):
-        try:
-            os.remove(cloudflared_log)
-        except Exception:
-            pass
+    
+    # Track offset to ignore old log entries from previous runs
+    start_offset = os.path.getsize(cloudflared_log) if os.path.exists(cloudflared_log) else 0
 
     cmd = [CLOUDFLARED_PATH, "tunnel", "--url", "http://127.0.0.1:8000", "--logfile", cloudflared_log]
-    logger.info(f"Starting cloudflared with logfile: {cloudflared_log}")
+    logger.info(f"Starting cloudflared with logfile: {cloudflared_log} (offset: {start_offset})")
     
     proc = subprocess.Popen(cmd)
     
@@ -74,10 +72,11 @@ def run_tunnel():
         if os.path.exists(cloudflared_log):
             try:
                 with open(cloudflared_log, "r", encoding="utf-8", errors="ignore") as f:
+                    f.seek(start_offset)
                     content = f.read()
-                    match = re.search(r"https://[a-zA-Z0-9\-]+\.trycloudflare\.com", content)
-                    if match:
-                        tunnel_url = match.group(0)
+                    matches = re.findall(r"https://[a-zA-Z0-9\-]+\.trycloudflare\.com", content)
+                    if matches:
+                        tunnel_url = matches[-1]
                         logger.info(f"==> NEW TUNNEL DISCOVERED: {tunnel_url} <==")
                         success = update_worker_script(tunnel_url)
                         if success:
